@@ -205,8 +205,8 @@ export function FlightLogIndex(logData) {
               );
               break;
             case "G":
-              lastGPS = frame.slice(0);
-              lastGPS.shift(); // Remove the time field
+              // G frames carry "time" only when not every frame is logged
+              lastGPS = frame.slice(parser.frameDefs.G?.name[0] === "time" ? 1 : 0);
               break;
             case "H":
               lastGPSHome = frame.slice(0);
