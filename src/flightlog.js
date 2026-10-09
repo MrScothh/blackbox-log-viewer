@@ -268,7 +268,8 @@ export function FlightLog(logData) {
     // Heading: ATTITUDE enabled (quaternion available) OR both GYRO and ACC enabled (IMU estimation)
     const hasQuaternion = fieldNames.includes("imuQuaternion[0]");
     const hasGyroAndAcc = fieldNames.includes("gyroADC[0]") && fieldNames.includes("accSmooth[0]");
-    if (hasQuaternion || hasGyroAndAcc) {
+    const hasAttitude = fieldNames.includes("attitude[0]");
+    if (hasQuaternion || hasGyroAndAcc || hasAttitude) {
       fieldNames.push("heading[0]", "heading[1]", "heading[2]");
     }
 
@@ -646,9 +647,16 @@ export function FlightLog(logData) {
     srcFrame,
     destFrame,
     fieldIndex,
-    { imuQuaternion, gyroADC, accSmooth, magADC, chunkIMU, sysConfig },
+    { attitude, imuQuaternion, gyroADC, accSmooth, magADC, chunkIMU, sysConfig },
   ) => {
-    if (imuQuaternion) {
+    if (attitude) {
+      // INAV logs its own estimate in decidegrees, same axes and signs as the ones computed below, with the
+      // heading from compass or GPS rather than integrated gyro
+      const toRadians = Math.PI / 1800;
+      destFrame[fieldIndex++] = srcFrame[attitude[0]] * toRadians;
+      destFrame[fieldIndex++] = srcFrame[attitude[1]] * toRadians;
+      destFrame[fieldIndex++] = srcFrame[attitude[2]] * toRadians;
+    } else if (imuQuaternion) {
       const scaleFromFixedInt16 = 0x7fff; // 0x7FFF = 2^15 - 1
       const q = {
         x: srcFrame[imuQuaternion[0]] / scaleFromFixedInt16,
@@ -889,6 +897,7 @@ export function FlightLog(logData) {
     let accSmooth = [fieldNameToIndex["accSmooth[0]"], fieldNameToIndex["accSmooth[1]"], fieldNameToIndex["accSmooth[2]"]];
     let magADC = [fieldNameToIndex["magADC[0]"], fieldNameToIndex["magADC[1]"], fieldNameToIndex["magADC[2]"]];
     let imuQuaternion = [fieldNameToIndex["imuQuaternion[0]"], fieldNameToIndex["imuQuaternion[1]"], fieldNameToIndex["imuQuaternion[2]"]];
+    let attitude = [fieldNameToIndex["attitude[0]"], fieldNameToIndex["attitude[1]"], fieldNameToIndex["attitude[2]"]];
     let rcCommand = [fieldNameToIndex["rcCommand[0]"], fieldNameToIndex["rcCommand[1]"], fieldNameToIndex["rcCommand[2]"], fieldNameToIndex["rcCommand[3]"]];
     let setpoint = [fieldNameToIndex["setpoint[0]"], fieldNameToIndex["setpoint[1]"], fieldNameToIndex["setpoint[2]"], fieldNameToIndex["setpoint[3]"]];
     // INAV logs the PID controller's rate target as axisRate (deg/s); the throttle stays rcCommand[3]
@@ -907,6 +916,7 @@ export function FlightLog(logData) {
     if (!gyroADC[0]) { gyroADC = false; }
     if (!accSmooth[0]) { accSmooth = false; }
     if (!imuQuaternion[0]) { imuQuaternion = false; }
+    if (attitude[0] === undefined) { attitude = false; }
     if (!rcCommand[0]) { rcCommand = false; }
     if (!setpoint[0]) { setpoint = false; }
     if (!axisPID[0]) { axisPID = false; }
@@ -914,7 +924,7 @@ export function FlightLog(logData) {
     if (!gpsVelNED[0]) { gpsVelNED = false; }
 
     return {
-      gyroADC, accSmooth, magADC, imuQuaternion, rcCommand, setpoint,
+      gyroADC, accSmooth, magADC, imuQuaternion, attitude, rcCommand, setpoint,
       gpsCoord, gpsVelNED, axisPID,
       numSatIndex: fieldNameToIndex["GPS_numSat"],
       flightModeFlagsIndex: fieldNameToIndex["flightModeFlags"],
@@ -930,6 +940,7 @@ export function FlightLog(logData) {
     let fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
 
     fieldIndex = computeAttitude(srcFrame, destFrame, fieldIndex, {
+      attitude: ctx.attitude,
       imuQuaternion: ctx.imuQuaternion,
       gyroADC: ctx.gyroADC,
       accSmooth: ctx.accSmooth,
