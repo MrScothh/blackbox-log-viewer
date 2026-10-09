@@ -1288,7 +1288,7 @@ export function FlightLogParser(logData) {
          * save space for positive values). So we need to convert those very large unsigned values into their
          * corresponding 32-bit signed values.
          */
-        value = Math.trunc(value) + this.sysConfig.minthrottle;
+        value = (Math.trunc(value) | 0) + this.sysConfig.minthrottle;
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_MINMOTOR:
         /*
@@ -1297,7 +1297,7 @@ export function FlightLogParser(logData) {
          * save space for positive values). So we need to convert those very large unsigned values into their
          * corresponding 32-bit signed values.
          */
-        value = Math.trunc(value) + Math.trunc(this.sysConfig.motorOutput[0]); // motorOutput[0] is the min motor output
+        value = (Math.trunc(value) | 0) + Math.trunc(this.sysConfig.motorOutput[0]); // motorOutput[0] is the min motor output
         break;
       case FLIGHT_LOG_FIELD_PREDICTOR_1500:
         value += 1500;
