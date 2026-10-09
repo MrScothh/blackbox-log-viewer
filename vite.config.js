@@ -42,6 +42,8 @@ export default defineConfig(({ mode }) => ({
   build: {
     sourcemap: true,
   },
+  // electron-forge's packages: nothing for the dev server to watch, and locked files crash its watcher
+  server: { watch: { ignored: ["**/out/**"] } },
   plugins: [
     debugFiles(),
     vue(),
