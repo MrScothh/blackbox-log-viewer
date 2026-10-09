@@ -6,14 +6,22 @@
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { format } from "prettier";
 
 const [repo, rev = "HEAD"] = process.argv.slice(2);
 if (!repo) {
   console.error("usage: node tools/inav-defs.mjs PATH_TO_INAV_REPO [GIT_REV]");
   process.exit(1);
 }
-const show = (file) => execFileSync("git", ["-C", repo, "show", `${rev}:${file}`], { encoding: "utf8" });
-const revision = execFileSync("git", ["-C", repo, "rev-parse", "--short", rev], { encoding: "utf8" }).trim();
+const show = (file) =>
+  execFileSync("git", ["-C", repo, "show", `${rev}:${file}`], {
+    encoding: "utf8",
+  });
+const revision = execFileSync(
+  "git",
+  ["-C", repo, "rev-parse", "--short", rev],
+  { encoding: "utf8" },
+).trim();
 
 // Values of a C enum that ends with "} name;"; handles "= N", "= (1 << N)" and implicit increments
 function readEnum(source, name) {
@@ -67,7 +75,9 @@ boxIds.delete("CHECKBOX_ITEM_COUNT");
 
 // The names the Configurator's Modes tab shows, from the firmware's MSP box table
 const boxNames = new Map();
-for (const m of show("src/main/fc/fc_msp_box.c").matchAll(/\.boxId\s*=\s*(BOX\w+),\s*\.boxName\s*=\s*"([^"]+)"/g)) {
+for (const m of show("src/main/fc/fc_msp_box.c").matchAll(
+  /\.boxId\s*=\s*(BOX\w+),\s*\.boxName\s*=\s*"([^"]+)"/g,
+)) {
   boxNames.set(m[1], m[2]);
 }
 const rcModeNames = [];
@@ -87,13 +97,24 @@ const tables = {
     flags: true,
     rename: (n) => n.replace(/_MODE$/, "").replaceAll("_", " "),
   }),
-  INAV_STATE_FLAG_NAMES: table(readEnum(runtime, "stateFlags_t"), { flags: true }),
-  INAV_ARMING_FLAG_NAMES: table(readEnum(runtime, "armingFlag_e"), { flags: true, prefix: "ARMING_DISABLED_" }),
-  INAV_FAILSAFE_PHASE_NAMES: table(readEnum(show("src/main/flight/failsafe.h"), "failsafePhase_e"), {
-    prefix: "FAILSAFE_",
+  INAV_STATE_FLAG_NAMES: table(readEnum(runtime, "stateFlags_t"), {
+    flags: true,
   }),
+  INAV_ARMING_FLAG_NAMES: table(readEnum(runtime, "armingFlag_e"), {
+    flags: true,
+    prefix: "ARMING_DISABLED_",
+  }),
+  INAV_FAILSAFE_PHASE_NAMES: table(
+    readEnum(show("src/main/flight/failsafe.h"), "failsafePhase_e"),
+    {
+      prefix: "FAILSAFE_",
+    },
+  ),
   INAV_NAV_STATE_NAMES: table(
-    readEnum(show("src/main/navigation/navigation_private.h"), "navigationPersistentId_e"),
+    readEnum(
+      show("src/main/navigation/navigation_private.h"),
+      "navigationPersistentId_e",
+    ),
     { prefix: "NAV_PERSISTENT_ID_" },
   ),
 };
@@ -119,10 +140,21 @@ navFlagNames[4] ??= "GPS_GLITCH"; // until INAV 7
 tables.INAV_NAV_FLAG_NAMES = Array.from(navFlagNames, (v) => v ?? null);
 
 // hwHealthStatus: two bits per sensor in this order, values from hardwareSensorStatus_e
-tables.INAV_HW_HEALTH_SENSORS = ["GYRO", "ACC", "MAG", "BARO", "GPS", "RANGEFINDER", "PITOT"];
-tables.INAV_HW_HEALTH_STATUS = table(readEnum(show("src/main/sensors/diagnostics.h"), "hardwareSensorStatus_e"), {
-  prefix: "HW_SENSOR_",
-});
+tables.INAV_HW_HEALTH_SENSORS = [
+  "GYRO",
+  "ACC",
+  "MAG",
+  "BARO",
+  "GPS",
+  "RANGEFINDER",
+  "PITOT",
+];
+tables.INAV_HW_HEALTH_STATUS = table(
+  readEnum(show("src/main/sensors/diagnostics.h"), "hardwareSensorStatus_e"),
+  {
+    prefix: "HW_SENSOR_",
+  },
+);
 
 // settings.yaml lookup tables and the feature names did get renumbered between releases (a magnetometer driver
 // inserted in 9.0 moved the ones after it, MOTOR_STOP became GEOZONE in 8.0), so they are kept per release and
@@ -155,7 +187,9 @@ const SETTINGS_TABLES = [
 function settingsTables(yaml) {
   const section = yaml.split(/^tables:/m)[1].split(/^groups:/m)[0];
   const out = {};
-  for (const m of section.matchAll(/- name: (\w+)\s*\n\s*values: \[([\s\S]*?)\]/g)) {
+  for (const m of section.matchAll(
+    /- name: (\w+)\s*\n\s*values: \[([\s\S]*?)\]/g,
+  )) {
     if (SETTINGS_TABLES.includes(m[1])) {
       out[m[1]] = m[2]
         .split(",")
@@ -172,7 +206,10 @@ function featureNames(cli) {
 }
 
 const versioned = VERSIONED.map(([from, versionRev]) => {
-  const read = (file) => execFileSync("git", ["-C", repo, "show", `${versionRev}:${file}`], { encoding: "utf8" });
+  const read = (file) =>
+    execFileSync("git", ["-C", repo, "show", `${versionRev}:${file}`], {
+      encoding: "utf8",
+    });
   return {
     from,
     ...settingsTables(read("src/main/fc/settings.yaml")),
@@ -188,5 +225,8 @@ for (const [name, values] of Object.entries(tables)) {
 js += `\n// Per release, oldest first: use the last entry whose "from" is not newer than the log's version\n`;
 js += `export const INAV_VERSIONED_TABLES = Object.freeze(${JSON.stringify(versioned, null, 2)});\n`;
 const target = fileURLToPath(new URL("../src/inav_defs.js", import.meta.url));
-writeFileSync(target, js);
-console.log(`${target}: ${Object.keys(tables).length} tables from INAV ${revision}`);
+// in the project's style, so eslint (comma-dangle) and "npm run format" leave it alone
+writeFileSync(target, await format(js, { filepath: target }));
+console.log(
+  `${target}: ${Object.keys(tables).length} tables from INAV ${revision}`,
+);

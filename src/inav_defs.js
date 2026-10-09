@@ -65,7 +65,7 @@ export const INAV_RC_MODE_NAMES = Object.freeze([
   "AUTO SPEED",
   "TERRAIN AGL HOLD",
   "IN FLIGHT MENU",
-  "THRUST REVERSE"
+  "THRUST REVERSE",
 ]);
 
 export const INAV_FLIGHT_MODE_NAMES = Object.freeze([
@@ -88,7 +88,7 @@ export const INAV_FLIGHT_MODE_NAMES = Object.freeze([
   "SOARING",
   "ANGLEHOLD",
   "NAV FW AUTOLAND",
-  "NAV SEND TO"
+  "NAV SEND TO",
 ]);
 
 export const INAV_STATE_FLAG_NAMES = Object.freeze([
@@ -120,7 +120,7 @@ export const INAV_STATE_FLAG_NAMES = Object.freeze([
   "ANTI_WINDUP_DEACTIVATED",
   "LANDING_DETECTED",
   "IN_FLIGHT_EMERG_REARM",
-  "TAILSITTER"
+  "TAILSITTER",
 ]);
 
 export const INAV_ARMING_FLAG_NAMES = Object.freeze([
@@ -154,7 +154,7 @@ export const INAV_ARMING_FLAG_NAMES = Object.freeze([
   "PWM_OUTPUT_ERROR",
   "NO_PREARM",
   "DSHOT_BEEPER",
-  "LANDING_DETECTED"
+  "LANDING_DETECTED",
 ]);
 
 export const INAV_FAILSAFE_PHASE_NAMES = Object.freeze([
@@ -165,7 +165,7 @@ export const INAV_FAILSAFE_PHASE_NAMES = Object.freeze([
   "LANDING",
   "LANDED",
   "RX_LOSS_MONITORING",
-  "RX_LOSS_RECOVERED"
+  "RX_LOSS_RECOVERED",
 ]);
 
 export const INAV_NAV_STATE_NAMES = Object.freeze([
@@ -221,7 +221,7 @@ export const INAV_NAV_STATE_NAMES = Object.freeze([
   "SEND_TO_INITALIZE",
   "SEND_TO_IN_PROGRES",
   "SEND_TO_FINISHED",
-  "MIXERAT_MISSION_CAPTURE"
+  "MIXERAT_MISSION_CAPTURE",
 ]);
 
 export const INAV_NAV_FLAG_NAMES = Object.freeze([
@@ -233,7 +233,7 @@ export const INAV_NAV_FLAG_NAMES = Object.freeze([
   "HEADING_TRUSTED",
   "ADJUSTING_POSITION",
   "ADJUSTING_ALTITUDE",
-  "ADJUSTING_HEADING"
+  "ADJUSTING_HEADING",
 ]);
 
 export const INAV_HW_HEALTH_SENSORS = Object.freeze([
@@ -243,21 +243,21 @@ export const INAV_HW_HEALTH_SENSORS = Object.freeze([
   "BARO",
   "GPS",
   "RANGEFINDER",
-  "PITOT"
+  "PITOT",
 ]);
 
 export const INAV_HW_HEALTH_STATUS = Object.freeze([
   "NONE",
   "OK",
   "UNAVAILABLE",
-  "UNHEALTHY"
+  "UNHEALTHY",
 ]);
 
 // Per release, oldest first: use the last entry whose "from" is not newer than the log's version
 export const INAV_VERSIONED_TABLES = Object.freeze([
   {
-    "from": "7.0.0",
-    "acc_hardware": [
+    from: "7.0.0",
+    acc_hardware: [
       "NONE",
       "AUTO",
       "MPU6000",
@@ -269,9 +269,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "ICM42605",
       "BMI270",
       "LSM6DXX",
-      "FAKE"
+      "FAKE",
     ],
-    "rangefinder_hardware": [
+    rangefinder_hardware: [
       "NONE",
       "SRF10",
       "VL53L0X",
@@ -280,9 +280,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "VL53L1X",
       "US42",
       "TOF10120_I2C",
-      "FAKE"
+      "FAKE",
     ],
-    "mag_hardware": [
+    mag_hardware: [
       "NONE",
       "AUTO",
       "HMC5883",
@@ -298,15 +298,10 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "RM3100",
       "VCM5883",
       "MLX90393",
-      "FAKE"
+      "FAKE",
     ],
-    "opflow_hardware": [
-      "NONE",
-      "CXOF",
-      "MSP",
-      "FAKE"
-    ],
-    "baro_hardware": [
+    opflow_hardware: ["NONE", "CXOF", "MSP", "FAKE"],
+    baro_hardware: [
       "NONE",
       "AUTO",
       "BMP085",
@@ -319,9 +314,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "DPS310",
       "B2SMPB",
       "MSP",
-      "FAKE"
+      "FAKE",
     ],
-    "pitot_hardware": [
+    pitot_hardware: [
       "NONE",
       "AUTO",
       "MS4525",
@@ -329,15 +324,10 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "VIRTUAL",
       "FAKE",
       "MSP",
-      "DLVR-L10D"
+      "DLVR-L10D",
     ],
-    "receiver_type": [
-      "NONE",
-      "SERIAL",
-      "MSP",
-      "SIM (SITL)"
-    ],
-    "serial_rx": [
+    receiver_type: ["NONE", "SERIAL", "MSP", "SIM (SITL)"],
+    serial_rx: [
       "SPEK1024",
       "SPEK2048",
       "SBUS",
@@ -351,31 +341,20 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "SRXL2",
       "GHST",
       "MAVLINK",
-      "FBUS"
+      "FBUS",
     ],
-    "motor_pwm_protocol": [
+    motor_pwm_protocol: [
       "STANDARD",
       "ONESHOT125",
       "MULTISHOT",
       "BRUSHED",
       "DSHOT150",
       "DSHOT300",
-      "DSHOT600"
+      "DSHOT600",
     ],
-    "current_sensor": [
-      "NONE",
-      "ADC",
-      "VIRTUAL",
-      "FAKE",
-      "ESC"
-    ],
-    "voltage_sensor": [
-      "NONE",
-      "ADC",
-      "ESC",
-      "FAKE"
-    ],
-    "debug_modes": [
+    current_sensor: ["NONE", "ADC", "VIRTUAL", "FAKE", "ESC"],
+    voltage_sensor: ["NONE", "ADC", "ESC", "FAKE"],
+    debug_modes: [
       "NONE",
       "AGL",
       "FLOW_RAW",
@@ -396,27 +375,19 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "AUTOTUNE",
       "RATE_DYNAMICS",
       "LANDING",
-      "POS_EST"
+      "POS_EST",
     ],
-    "platform_type": [
+    platform_type: [
       "MULTIROTOR",
       "AIRPLANE",
       "HELICOPTER",
       "TRICOPTER",
       "ROVER",
-      "BOAT"
+      "BOAT",
     ],
-    "filter_type": [
-      "PT1",
-      "BIQUAD"
-    ],
-    "filter_type_full": [
-      "PT1",
-      "BIQUAD",
-      "PT2",
-      "PT3"
-    ],
-    "features": [
+    filter_type: ["PT1", "BIQUAD"],
+    filter_type_full: ["PT1", "BIQUAD", "PT2", "PT3"],
+    features: [
       "THR_VBAT_COMP",
       "VBAT",
       "TX_PROF_SEL",
@@ -448,12 +419,12 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "PWM_OUTPUT_ENABLE",
       "OSD",
       "FW_LAUNCH",
-      "FW_AUTOTRIM"
-    ]
+      "FW_AUTOTRIM",
+    ],
   },
   {
-    "from": "8.0.0",
-    "acc_hardware": [
+    from: "8.0.0",
+    acc_hardware: [
       "NONE",
       "AUTO",
       "MPU6000",
@@ -465,9 +436,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "ICM42605",
       "BMI270",
       "LSM6DXX",
-      "FAKE"
+      "FAKE",
     ],
-    "rangefinder_hardware": [
+    rangefinder_hardware: [
       "NONE",
       "SRF10",
       "VL53L0X",
@@ -479,9 +450,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "FAKE",
       "TERARANGER_EVO",
       "USD1_V0",
-      "NRA"
+      "NRA",
     ],
-    "mag_hardware": [
+    mag_hardware: [
       "NONE",
       "AUTO",
       "HMC5883",
@@ -497,15 +468,10 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "RM3100",
       "VCM5883",
       "MLX90393",
-      "FAKE"
+      "FAKE",
     ],
-    "opflow_hardware": [
-      "NONE",
-      "CXOF",
-      "MSP",
-      "FAKE"
-    ],
-    "baro_hardware": [
+    opflow_hardware: ["NONE", "CXOF", "MSP", "FAKE"],
+    baro_hardware: [
       "NONE",
       "AUTO",
       "BMP085",
@@ -518,9 +484,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "DPS310",
       "B2SMPB",
       "MSP",
-      "FAKE"
+      "FAKE",
     ],
-    "pitot_hardware": [
+    pitot_hardware: [
       "NONE",
       "AUTO",
       "MS4525",
@@ -528,15 +494,10 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "VIRTUAL",
       "FAKE",
       "MSP",
-      "DLVR-L10D"
+      "DLVR-L10D",
     ],
-    "receiver_type": [
-      "NONE",
-      "SERIAL",
-      "MSP",
-      "SIM (SITL)"
-    ],
-    "serial_rx": [
+    receiver_type: ["NONE", "SERIAL", "MSP", "SIM (SITL)"],
+    serial_rx: [
       "SPEK1024",
       "SPEK2048",
       "SBUS",
@@ -551,31 +512,20 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "GHST",
       "MAVLINK",
       "FBUS",
-      "SBUS2"
+      "SBUS2",
     ],
-    "motor_pwm_protocol": [
+    motor_pwm_protocol: [
       "STANDARD",
       "ONESHOT125",
       "MULTISHOT",
       "BRUSHED",
       "DSHOT150",
       "DSHOT300",
-      "DSHOT600"
+      "DSHOT600",
     ],
-    "current_sensor": [
-      "NONE",
-      "ADC",
-      "VIRTUAL",
-      "FAKE",
-      "ESC"
-    ],
-    "voltage_sensor": [
-      "NONE",
-      "ADC",
-      "ESC",
-      "FAKE"
-    ],
-    "debug_modes": [
+    current_sensor: ["NONE", "ADC", "VIRTUAL", "FAKE", "ESC"],
+    voltage_sensor: ["NONE", "ADC", "ESC", "FAKE"],
+    debug_modes: [
       "NONE",
       "AGL",
       "FLOW_RAW",
@@ -601,28 +551,19 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "HEADTRACKER",
       "GPS",
       "LULU",
-      "SBUS2"
+      "SBUS2",
     ],
-    "platform_type": [
+    platform_type: [
       "MULTIROTOR",
       "AIRPLANE",
       "HELICOPTER",
       "TRICOPTER",
       "ROVER",
-      "BOAT"
+      "BOAT",
     ],
-    "filter_type": [
-      "PT1",
-      "BIQUAD"
-    ],
-    "filter_type_full": [
-      "PT1",
-      "BIQUAD",
-      "PT2",
-      "PT3",
-      "LULU"
-    ],
-    "features": [
+    filter_type: ["PT1", "BIQUAD"],
+    filter_type_full: ["PT1", "BIQUAD", "PT2", "PT3", "LULU"],
+    features: [
       "THR_VBAT_COMP",
       "VBAT",
       "TX_PROF_SEL",
@@ -654,12 +595,12 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "PWM_OUTPUT_ENABLE",
       "OSD",
       "FW_LAUNCH",
-      "FW_AUTOTRIM"
-    ]
+      "FW_AUTOTRIM",
+    ],
   },
   {
-    "from": "9.0.0",
-    "acc_hardware": [
+    from: "9.0.0",
+    acc_hardware: [
       "NONE",
       "AUTO",
       "MPU6000",
@@ -671,9 +612,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "ICM42605",
       "BMI270",
       "LSM6DXX",
-      "FAKE"
+      "FAKE",
     ],
-    "rangefinder_hardware": [
+    rangefinder_hardware: [
       "NONE",
       "SRF10",
       "VL53L0X",
@@ -685,9 +626,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "FAKE",
       "TERARANGER_EVO",
       "USD1_V0",
-      "NRA"
+      "NRA",
     ],
-    "mag_hardware": [
+    mag_hardware: [
       "NONE",
       "AUTO",
       "HMC5883",
@@ -704,15 +645,10 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "RM3100",
       "VCM5883",
       "MLX90393",
-      "FAKE"
+      "FAKE",
     ],
-    "opflow_hardware": [
-      "NONE",
-      "CXOF",
-      "MSP",
-      "FAKE"
-    ],
-    "baro_hardware": [
+    opflow_hardware: ["NONE", "CXOF", "MSP", "FAKE"],
+    baro_hardware: [
       "NONE",
       "AUTO",
       "BMP085",
@@ -725,9 +661,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "DPS310",
       "B2SMPB",
       "MSP",
-      "FAKE"
+      "FAKE",
     ],
-    "pitot_hardware": [
+    pitot_hardware: [
       "NONE",
       "AUTO",
       "MS4525",
@@ -735,15 +671,10 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "VIRTUAL",
       "FAKE",
       "MSP",
-      "DLVR-L10D"
+      "DLVR-L10D",
     ],
-    "receiver_type": [
-      "NONE",
-      "SERIAL",
-      "MSP",
-      "SIM (SITL)"
-    ],
-    "serial_rx": [
+    receiver_type: ["NONE", "SERIAL", "MSP", "SIM (SITL)"],
+    serial_rx: [
       "SPEK1024",
       "SPEK2048",
       "SBUS",
@@ -758,33 +689,20 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "GHST",
       "MAVLINK",
       "FBUS",
-      "SBUS2"
+      "SBUS2",
     ],
-    "motor_pwm_protocol": [
+    motor_pwm_protocol: [
       "STANDARD",
       "ONESHOT125",
       "MULTISHOT",
       "BRUSHED",
       "DSHOT150",
       "DSHOT300",
-      "DSHOT600"
+      "DSHOT600",
     ],
-    "current_sensor": [
-      "NONE",
-      "ADC",
-      "VIRTUAL",
-      "FAKE",
-      "ESC",
-      "SMARTPORT"
-    ],
-    "voltage_sensor": [
-      "NONE",
-      "ADC",
-      "ESC",
-      "FAKE",
-      "SMARTPORT"
-    ],
-    "debug_modes": [
+    current_sensor: ["NONE", "ADC", "VIRTUAL", "FAKE", "ESC", "SMARTPORT"],
+    voltage_sensor: ["NONE", "ADC", "ESC", "FAKE", "SMARTPORT"],
+    debug_modes: [
       "NONE",
       "AGL",
       "FLOW_RAW",
@@ -810,28 +728,19 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "HEADTRACKER",
       "GPS",
       "LULU",
-      "SBUS2"
+      "SBUS2",
     ],
-    "platform_type": [
+    platform_type: [
       "MULTIROTOR",
       "AIRPLANE",
       "HELICOPTER",
       "TRICOPTER",
       "ROVER",
-      "BOAT"
+      "BOAT",
     ],
-    "filter_type": [
-      "PT1",
-      "BIQUAD"
-    ],
-    "filter_type_full": [
-      "PT1",
-      "BIQUAD",
-      "PT2",
-      "PT3",
-      "LULU"
-    ],
-    "features": [
+    filter_type: ["PT1", "BIQUAD"],
+    filter_type_full: ["PT1", "BIQUAD", "PT2", "PT3", "LULU"],
+    features: [
       "THR_VBAT_COMP",
       "VBAT",
       "TX_PROF_SEL",
@@ -863,12 +772,12 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "PWM_OUTPUT_ENABLE",
       "OSD",
       "FW_LAUNCH",
-      "FW_AUTOTRIM"
-    ]
+      "FW_AUTOTRIM",
+    ],
   },
   {
-    "from": "9.1.0",
-    "acc_hardware": [
+    from: "9.1.0",
+    acc_hardware: [
       "NONE",
       "AUTO",
       "MPU6000",
@@ -881,9 +790,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "BMI270",
       "LSM6DXX",
       "ICM45686",
-      "FAKE"
+      "FAKE",
     ],
-    "rangefinder_hardware": [
+    rangefinder_hardware: [
       "NONE",
       "SRF10",
       "VL53L0X",
@@ -895,9 +804,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "FAKE",
       "TERARANGER_EVO",
       "USD1_V0",
-      "NRA"
+      "NRA",
     ],
-    "mag_hardware": [
+    mag_hardware: [
       "NONE",
       "AUTO",
       "HMC5883",
@@ -914,15 +823,10 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "RM3100",
       "VCM5883",
       "MLX90393",
-      "FAKE"
+      "FAKE",
     ],
-    "opflow_hardware": [
-      "NONE",
-      "CXOF",
-      "MSP",
-      "FAKE"
-    ],
-    "baro_hardware": [
+    opflow_hardware: ["NONE", "CXOF", "MSP", "FAKE"],
+    baro_hardware: [
       "NONE",
       "AUTO",
       "BMP085",
@@ -935,9 +839,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "DPS310",
       "B2SMPB",
       "MSP",
-      "FAKE"
+      "FAKE",
     ],
-    "pitot_hardware": [
+    pitot_hardware: [
       "NONE",
       "AUTO",
       "MS4525",
@@ -946,15 +850,10 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "FAKE",
       "MSP",
       "DLVR-L10D",
-      "MS5525"
+      "MS5525",
     ],
-    "receiver_type": [
-      "NONE",
-      "SERIAL",
-      "MSP",
-      "SIM (SITL)"
-    ],
-    "serial_rx": [
+    receiver_type: ["NONE", "SERIAL", "MSP", "SIM (SITL)"],
+    serial_rx: [
       "SPEK1024",
       "SPEK2048",
       "SBUS",
@@ -969,33 +868,20 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "GHST",
       "MAVLINK",
       "FBUS",
-      "SBUS2"
+      "SBUS2",
     ],
-    "motor_pwm_protocol": [
+    motor_pwm_protocol: [
       "STANDARD",
       "ONESHOT125",
       "MULTISHOT",
       "BRUSHED",
       "DSHOT150",
       "DSHOT300",
-      "DSHOT600"
+      "DSHOT600",
     ],
-    "current_sensor": [
-      "NONE",
-      "ADC",
-      "VIRTUAL",
-      "FAKE",
-      "ESC",
-      "SMARTPORT"
-    ],
-    "voltage_sensor": [
-      "NONE",
-      "ADC",
-      "ESC",
-      "FAKE",
-      "SMARTPORT"
-    ],
-    "debug_modes": [
+    current_sensor: ["NONE", "ADC", "VIRTUAL", "FAKE", "ESC", "SMARTPORT"],
+    voltage_sensor: ["NONE", "ADC", "ESC", "FAKE", "SMARTPORT"],
+    debug_modes: [
       "NONE",
       "AGL",
       "FLOW_RAW",
@@ -1021,28 +907,19 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "HEADTRACKER",
       "GPS",
       "LULU",
-      "SBUS2"
+      "SBUS2",
     ],
-    "platform_type": [
+    platform_type: [
       "MULTIROTOR",
       "AIRPLANE",
       "HELICOPTER",
       "TRICOPTER",
       "ROVER",
-      "BOAT"
+      "BOAT",
     ],
-    "filter_type": [
-      "PT1",
-      "BIQUAD"
-    ],
-    "filter_type_full": [
-      "PT1",
-      "BIQUAD",
-      "PT2",
-      "PT3",
-      "LULU"
-    ],
-    "features": [
+    filter_type: ["PT1", "BIQUAD"],
+    filter_type_full: ["PT1", "BIQUAD", "PT2", "PT3", "LULU"],
+    features: [
       "THR_VBAT_COMP",
       "VBAT",
       "TX_PROF_SEL",
@@ -1074,12 +951,12 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "PWM_OUTPUT_ENABLE",
       "OSD",
       "FW_LAUNCH",
-      "FW_AUTOTRIM"
-    ]
+      "FW_AUTOTRIM",
+    ],
   },
   {
-    "from": "10.0.0",
-    "acc_hardware": [
+    from: "10.0.0",
+    acc_hardware: [
       "NONE",
       "AUTO",
       "MPU6000",
@@ -1093,9 +970,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "LSM6DXX",
       "ICM45686",
       "ICM40609D",
-      "FAKE"
+      "FAKE",
     ],
-    "rangefinder_hardware": [
+    rangefinder_hardware: [
       "NONE",
       "SRF10",
       "VL53L0X",
@@ -1107,9 +984,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "FAKE",
       "TERARANGER_EVO",
       "USD1_V0",
-      "NRA"
+      "NRA",
     ],
-    "mag_hardware": [
+    mag_hardware: [
       "NONE",
       "AUTO",
       "HMC5883",
@@ -1127,15 +1004,10 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "VCM5883",
       "MLX90393",
       "LIS2MDL",
-      "FAKE"
+      "FAKE",
     ],
-    "opflow_hardware": [
-      "NONE",
-      "CXOF",
-      "MSP",
-      "FAKE"
-    ],
-    "baro_hardware": [
+    opflow_hardware: ["NONE", "CXOF", "MSP", "FAKE"],
+    baro_hardware: [
       "NONE",
       "AUTO",
       "BMP085",
@@ -1149,9 +1021,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "B2SMPB",
       "MSP",
       "FAKE",
-      "CRSF"
+      "CRSF",
     ],
-    "pitot_hardware": [
+    pitot_hardware: [
       "NONE",
       "AUTO",
       "MS4525",
@@ -1160,15 +1032,10 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "FAKE",
       "MSP",
       "DLVR-L10D",
-      "MS5525"
+      "MS5525",
     ],
-    "receiver_type": [
-      "NONE",
-      "SERIAL",
-      "MSP",
-      "SIM (SITL)"
-    ],
-    "serial_rx": [
+    receiver_type: ["NONE", "SERIAL", "MSP", "SIM (SITL)"],
+    serial_rx: [
       "SPEK1024",
       "SPEK2048",
       "SBUS",
@@ -1183,9 +1050,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "GHST",
       "MAVLINK",
       "FBUS",
-      "SBUS2"
+      "SBUS2",
     ],
-    "motor_pwm_protocol": [
+    motor_pwm_protocol: [
       "STANDARD",
       "ONESHOT125",
       "MULTISHOT",
@@ -1193,9 +1060,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "DSHOT150",
       "DSHOT300",
       "DSHOT600",
-      "SRXL2"
+      "SRXL2",
     ],
-    "current_sensor": [
+    current_sensor: [
       "NONE",
       "ADC",
       "VIRTUAL",
@@ -1204,9 +1071,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "SMARTPORT",
       "CRSF",
       "CAN",
-      "INA226"
+      "INA226",
     ],
-    "voltage_sensor": [
+    voltage_sensor: [
       "NONE",
       "ADC",
       "ESC",
@@ -1214,9 +1081,9 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "SMARTPORT",
       "CRSF",
       "CAN",
-      "INA226"
+      "INA226",
     ],
-    "debug_modes": [
+    debug_modes: [
       "NONE",
       "AGL",
       "FLOW_RAW",
@@ -1250,28 +1117,19 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "TERRAIN_NAV",
       "ESC",
       "FW_TURN",
-      "MAG"
+      "MAG",
     ],
-    "platform_type": [
+    platform_type: [
       "MULTIROTOR",
       "AIRPLANE",
       "HELICOPTER",
       "TRICOPTER",
       "ROVER",
-      "BOAT"
+      "BOAT",
     ],
-    "filter_type": [
-      "PT1",
-      "BIQUAD"
-    ],
-    "filter_type_full": [
-      "PT1",
-      "BIQUAD",
-      "PT2",
-      "PT3",
-      "LULU"
-    ],
-    "features": [
+    filter_type: ["PT1", "BIQUAD"],
+    filter_type_full: ["PT1", "BIQUAD", "PT2", "PT3", "LULU"],
+    features: [
       "THR_VBAT_COMP",
       "VBAT",
       "TX_PROF_SEL",
@@ -1303,7 +1161,7 @@ export const INAV_VERSIONED_TABLES = Object.freeze([
       "PWM_OUTPUT_ENABLE",
       "OSD",
       "FW_LAUNCH",
-      "FW_AUTOTRIM"
-    ]
-  }
+      "FW_AUTOTRIM",
+    ],
+  },
 ]);
