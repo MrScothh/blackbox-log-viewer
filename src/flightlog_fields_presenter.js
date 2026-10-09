@@ -1633,7 +1633,7 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
   }
 
   if (flightLog?.getSysConfig().firmwareType === FIRMWARE_TYPE_INAV) {
-    const inavText = decodeInavField(fieldName, value);
+    const inavText = decodeInavField(flightLog, fieldName, value, userSettings);
     if (inavText !== undefined) {
       return inavText;
     }

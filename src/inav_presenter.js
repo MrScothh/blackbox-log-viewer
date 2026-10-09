@@ -37,8 +37,92 @@ function presentHwHealth(value) {
   return sensors.length ? sensors.join(", ") : "NONE";
 }
 
+function altitude(meters, settings) {
+  return settings.altitudeUnits === 2 ? `${(meters * 3.28).toFixed(2)} ft` : `${meters.toFixed(2)} m`;
+}
+
+function speed(metersPerSecond, settings) {
+  switch (settings.speedUnits) {
+    case 2:
+      return `${(metersPerSecond * 3.6).toFixed(1)} km/h`;
+    case 3:
+      return `${(metersPerSecond * 2.2369).toFixed(1)} mph`;
+    default:
+      return `${metersPerSecond.toFixed(2)} m/s`;
+  }
+}
+
+// Units INAV logs in: centivolts, centiamps, centimetres, cm/s, decidegrees, decidegrees C
+function decodeInavUnits(flightLog, fieldName, value, settings) {
+  const base = fieldName.replace(/\[\d+\]$/, "");
+  const axis = /\[(\d+)\]$/.exec(fieldName)?.[1];
+  switch (base) {
+    case "gyroRaw":
+    case "gyroRaw2":
+    case "axisRate":
+      return `${Math.round(value)} °/s`;
+    case "rcCommand":
+      // roll, pitch and yaw are a stick deflection around 0; throttle is a pulse width
+      return axis === "3" ? `${value} us` : `${value}`;
+    case "rcData":
+    case "servo":
+      return `${value} us`;
+    case "vbat":
+    case "sagCompensatedVBat":
+      return `${(value / 100).toFixed(2)} V`;
+    case "amperage":
+      return `${(value / 100).toFixed(2)} A`;
+    case "BaroAlt":
+    case "navPos":
+    case "navTgtPos":
+    case "navSurf":
+    case "terrainAGL":
+    case "terrainAMSL":
+      return altitude(value / 100, settings);
+    case "navEPH":
+    case "navEPV":
+      return `${(value / 100).toFixed(2)} m`;
+    case "navVel":
+    case "navTgtVel":
+    case "wind":
+      // the vertical component stays in m/s whatever the speed unit
+      return axis === "2" ? `${(value / 100).toFixed(2)} m/s` : speed(value / 100, settings);
+    case "airSpeed":
+      return speed(value / 100, settings);
+    case "navTgtHdg":
+      return `${(value / 100).toFixed(1)} °`;
+    case "attitude":
+      return `${(value / 10).toFixed(1)} °`;
+    case "GPS_altitude":
+      return altitude(value, settings);
+    case "IMUTemperature":
+    case "baroTemperature":
+    case "escTemperature":
+    case "sens0Temp":
+    case "sens1Temp":
+    case "sens2Temp":
+    case "sens3Temp":
+    case "sens4Temp":
+    case "sens5Temp":
+    case "sens6Temp":
+    case "sens7Temp":
+      // -1250 marks a sensor that is not fitted
+      return value === -1250 ? "" : `${(value / 10).toFixed(1)} °C`;
+    case "escRPM":
+      return `${value} rpm`;
+    case "rxUpdateRate":
+      return `${value} Hz`;
+    default:
+      return undefined;
+  }
+}
+
 // Text for an INAV field, or undefined when the shared presenter already shows it correctly
-export function decodeInavField(fieldName, value) {
+export function decodeInavField(flightLog, fieldName, value, settings) {
+  const withUnit = decodeInavUnits(flightLog, fieldName, value, settings);
+  if (withUnit !== undefined) {
+    return withUnit;
+  }
   switch (fieldName) {
     case "flightModeFlags":
       return presentBits(value, INAV_RC_MODE_NAMES);
