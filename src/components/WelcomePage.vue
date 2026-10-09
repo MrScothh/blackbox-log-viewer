@@ -74,10 +74,7 @@
           <UIcon name="i-lucide-info" class="size-4 text-primary-500" />
           <h3>Links</h3>
         </div>
-        <p>
-          Based on the
-          <a href="https://github.com/betaflight/blackbox-log-viewer" target="_blank" rel="noopener noreferrer">Betaflight Blackbox Explorer</a>.
-        </p>
+        <p>INAV documentation, and the explorer's own source code.</p>
         <div class="info-links">
           <a href="https://github.com/iNavFlight/inav/wiki" target="_blank" rel="noopener noreferrer">
             <UIcon name="i-lucide-book" class="size-3.5" /> INAV wiki

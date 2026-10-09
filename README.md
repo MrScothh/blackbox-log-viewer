@@ -12,7 +12,7 @@ can be exported as a video of their own.
 It reads INAV's own fields with their names and units: modes, navigation states and failsafe phases with the
 firmware's names, positions in metres, rates in degrees per second, the multirotor and fixed wing navigation
 controllers, the log header in INAV's terms. Names and lookup tables follow the INAV release that wrote the log, from
-INAV 7 on. Older INAV logs, and Betaflight and Cleanflight logs, still open.
+INAV 7 on. Logs from older INAV releases still open.
 
 ## Installation
 
@@ -144,8 +144,7 @@ pull request; `nightly-build.yml` publishes them from `master` to the nightly re
 
 ### Where INAV lives in the code
 
-The explorer started as [Betaflight Blackbox Explorer](https://github.com/betaflight/blackbox-log-viewer). What is
-INAV's is kept in its own modules, so that the rest stays close to that code:
+INAV's names, units, graphs and header view are kept in their own modules:
 
 | file | what it holds |
 |---|---|
@@ -175,11 +174,6 @@ inavDebug.header()                                 // the parsed header
 inavDebug.theme("dark")                            // "dark", "light" or "auto"
 ```
 
-## Credits
-
-INAV Blackbox Explorer is based on Betaflight Blackbox Explorer, by the Betaflight project, which in turn descends from
-Nicholas Sherlock's Blackbox for Cleanflight. Open Sans and the INAV logo and icons come from INAV Configurator.
-
 ## License
 
-This project is licensed under GPLv3.
+This project is licensed under GPLv3. Open Sans and the INAV logo and icons come from INAV Configurator.

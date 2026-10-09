@@ -25,7 +25,7 @@ export const DarkTheme = {
     AUTO: 2,
   },
 
-  // Current mode setting (default to AUTO to match betaflight-configurator)
+  // Current mode setting, AUTO by default
   currentMode: 2,
 
   // Reference to prefs storage
