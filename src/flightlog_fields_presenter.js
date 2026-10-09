@@ -3,7 +3,7 @@ import {
   FLIGHT_LOG_FLIGHT_MODE_NAME,
   FLIGHT_LOG_FEATURES,
   DEBUG_MODE,
-  DEBUG_MODE_IS_INAV,
+  LOG_IS_INAV,
   FLIGHT_LOG_FLIGHT_STATE_NAME,
   FLIGHT_LOG_FAILSAFE_PHASE_NAME,
   FFT_CALC_STEPS,
@@ -13,6 +13,7 @@ import {
 } from "./flightlog_fielddefs";
 import { formatTime } from "./tools";
 import { decodeInavField } from "./inav_presenter.js";
+import { INAV_FRIENDLY_FIELD_NAMES } from "./inav_field_names.js";
 import { useSettingsStore } from "./stores/settings.js";
 
 export function FlightLogFieldPresenter() {
@@ -2395,7 +2396,7 @@ FlightLogFieldPresenter.fieldNameToFriendly = function (fieldName, debugMode) {
       const debugModeName = DEBUG_MODE[debugMode];
       let debugFields;
 
-      if (DEBUG_MODE_IS_INAV) {
+      if (LOG_IS_INAV) {
         return `${fieldName} (${debugModeName || debugMode})`;
       }
 
@@ -2412,6 +2413,9 @@ FlightLogFieldPresenter.fieldNameToFriendly = function (fieldName, debugMode) {
 
       return debugFields[fieldName] ?? fieldName;
     }
+  }
+  if (LOG_IS_INAV && INAV_FRIENDLY_FIELD_NAMES[fieldName]) {
+    return INAV_FRIENDLY_FIELD_NAMES[fieldName];
   }
   if (FRIENDLY_FIELD_NAMES[fieldName]) {
     return FRIENDLY_FIELD_NAMES[fieldName];
