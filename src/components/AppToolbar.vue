@@ -1,9 +1,9 @@
 <template>
   <div>
-    <!-- Logo bar with amber accent bottom border -->
+    <!-- Logo bar, charcoal with a blue line like the Configurator header -->
     <div class="toolbar-logo">
       <div class="flex items-center gap-2">
-        <img src="/images/light-wide-2.svg" alt="Betaflight" class="toolbar-logo-img" />
+        <img src="/images/inav_logo_wide.svg" alt="INAV" class="toolbar-logo-img" />
         <span class="toolbar-logo-subtitle">Blackbox Explorer</span>
       </div>
       <div class="flex items-center gap-3">
@@ -107,14 +107,13 @@ const appStore = useAppStore();
   align-items: center;
   justify-content: space-between;
   padding: 0.35rem 0.75rem;
-  background: hsl(0, 0%, 12%);
-  border-bottom: 2px solid var(--color-primary-500, #ffbb00);
+  background: #3d3f3e;
+  border-bottom: 2px solid var(--color-primary-500);
 }
 
 .toolbar-logo-img {
-  height: 1.5rem;
+  height: 1.1rem;
   width: auto;
-  filter: brightness(0) invert(1);
 }
 
 .toolbar-logo-subtitle {
@@ -122,12 +121,16 @@ const appStore = useAppStore();
   font-weight: 300;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-primary-500, #ffbb00);
+  color: hsl(0, 0%, 80%);
+}
+
+:root.dark .toolbar-logo {
+  background: #2e2e2e;
 }
 
 .toolbar-filename {
   font-size: 0.7rem;
-  color: hsl(0, 0%, 60%);
+  color: hsl(0, 0%, 70%);
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;

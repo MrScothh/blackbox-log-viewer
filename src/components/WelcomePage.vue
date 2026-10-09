@@ -2,9 +2,10 @@
   <div v-if="!logStore.hasLog" class="welcome-page">
     <!-- Hero -->
     <div class="hero">
-      <img src="/images/light-wide-2.svg" alt="Betaflight" class="hero-logo" />
+      <img src="/images/inav_logo_wide_on_light.svg" alt="INAV" class="hero-logo hero-logo-light" />
+      <img src="/images/inav_logo_wide.svg" alt="INAV" class="hero-logo hero-logo-dark" />
       <p class="hero-subtitle">Blackbox Explorer</p>
-      <p class="hero-tagline">Analyze flight logs recorded by Betaflight's Blackbox feature</p>
+      <p class="hero-tagline">Analyze flight logs recorded by INAV's blackbox</p>
       <LogFileInput size="lg" label="Open log file / video" @files-selected="$emit('files-selected', $event)" />
     </div>
 
@@ -16,18 +17,18 @@
           <h3>Getting Started</h3>
         </div>
         <p>
-          Blackbox is built in to
-          <a href="https://github.com/betaflight/betaflight/releases" target="_blank" rel="noopener noreferrer">Betaflight</a>
-          and supported on most flight controllers.
+          Blackbox is built into
+          <a href="https://github.com/iNavFlight/inav/releases" target="_blank" rel="noopener noreferrer">INAV</a>
+          and logs to an SD card or to the onboard flash.
         </p>
         <div class="info-links">
-          <a href="https://github.com/betaflight/betaflight/blob/master/docs/Blackbox.md" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/iNavFlight/inav/blob/master/docs/Blackbox.md" target="_blank" rel="noopener noreferrer">
             <UIcon name="i-lucide-file-text" class="size-3.5" /> Recording docs
           </a>
-          <a href="https://github.com/betaflight/blackbox-tools/blob/master/Readme.md" target="_blank" rel="noopener noreferrer">
-            <UIcon name="i-lucide-monitor" class="size-3.5" /> Viewer docs
+          <a href="https://github.com/iNavFlight/inav-configurator/releases" target="_blank" rel="noopener noreferrer">
+            <UIcon name="i-lucide-download" class="size-3.5" /> INAV Configurator
           </a>
-          <a href="https://github.com/betaflight/blackbox-log-viewer/issues" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/iNavFlight/blackbox-log-viewer/issues" target="_blank" rel="noopener noreferrer">
             <UIcon name="i-lucide-bug" class="size-3.5" /> Report a bug
           </a>
         </div>
@@ -38,16 +39,16 @@
           <UIcon name="i-lucide-sliders-horizontal" class="size-4 text-primary-500" />
           <h3>Tuning Resources</h3>
         </div>
-        <p>Use Blackbox insights to tune PIDs and filter settings.</p>
+        <p>Use Blackbox insights to tune PIDs, filters and navigation, on multirotors and planes.</p>
         <div class="info-links">
-          <a href="https://github.com/betaflight/betaflight/blob/master/docs/PID-Tuning.md" target="_blank" rel="noopener noreferrer">
-            <UIcon name="i-lucide-file-text" class="size-3.5" /> PID tuning docs
+          <a href="https://github.com/iNavFlight/inav/blob/master/docs/PID%20tuning.md" target="_blank" rel="noopener noreferrer">
+            <UIcon name="i-lucide-file-text" class="size-3.5" /> PID tuning
           </a>
-          <a href="http://www.rcgroups.com/forums/showthread.php?t=2439428" target="_blank" rel="noopener noreferrer">
-            <UIcon name="i-lucide-graduation-cap" class="size-3.5" /> PID guide — J. Bardwell
+          <a href="https://github.com/iNavFlight/inav/blob/master/docs/INAV%20PID%20Controller.md" target="_blank" rel="noopener noreferrer">
+            <UIcon name="i-lucide-file-text" class="size-3.5" /> INAV PID controller
           </a>
-          <a href="http://www.rcgroups.com/forums/showthread.php?t=2386267" target="_blank" rel="noopener noreferrer">
-            <UIcon name="i-lucide-message-circle" class="size-3.5" /> Log analysis — RCGroups
+          <a href="https://github.com/iNavFlight/inav/blob/master/docs/Autotune%20-%20fixedwing.md" target="_blank" rel="noopener noreferrer">
+            <UIcon name="i-lucide-plane" class="size-3.5" /> Fixed wing autotune
           </a>
         </div>
       </div>
@@ -59,11 +60,11 @@
         </div>
         <p>Convert and export your logs for further analysis.</p>
         <div class="info-links">
-          <a href="https://github.com/betaflight/blackbox-tools/" target="_blank" rel="noopener noreferrer">
-            <UIcon name="i-lucide-terminal" class="size-3.5" /> blackbox_decode — CSV export
+          <a href="https://github.com/iNavFlight/blackbox-tools/" target="_blank" rel="noopener noreferrer">
+            <UIcon name="i-lucide-terminal" class="size-3.5" /> blackbox_decode: CSV, GPX
           </a>
-          <a href="https://github.com/betaflight/blackbox-tools/" target="_blank" rel="noopener noreferrer">
-            <UIcon name="i-lucide-film" class="size-3.5" /> blackbox_render — PNG frames
+          <a href="https://github.com/iNavFlight/blackbox-tools/" target="_blank" rel="noopener noreferrer">
+            <UIcon name="i-lucide-film" class="size-3.5" /> blackbox_render: PNG frames
           </a>
         </div>
       </div>
@@ -73,14 +74,15 @@
           <UIcon name="i-lucide-info" class="size-4 text-primary-500" />
           <h3>Links</h3>
         </div>
+        <p>
+          Based on the
+          <a href="https://github.com/betaflight/blackbox-log-viewer" target="_blank" rel="noopener noreferrer">Betaflight Blackbox Explorer</a>.
+        </p>
         <div class="info-links">
-          <a href="https://blackbox.betaflight.com" target="_blank" rel="noopener noreferrer">
-            <UIcon name="i-lucide-globe" class="size-3.5" /> Latest release
+          <a href="https://github.com/iNavFlight/inav/wiki" target="_blank" rel="noopener noreferrer">
+            <UIcon name="i-lucide-book" class="size-3.5" /> INAV wiki
           </a>
-          <a href="https://master.blackbox.betaflight.com/" target="_blank" rel="noopener noreferrer">
-            <UIcon name="i-lucide-git-branch" class="size-3.5" /> Development build
-          </a>
-          <a href="https://github.com/betaflight/blackbox-log-viewer" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/iNavFlight/blackbox-log-viewer" target="_blank" rel="noopener noreferrer">
             <UIcon name="i-lucide-github" class="size-3.5" /> Source on GitHub
           </a>
         </div>
@@ -102,9 +104,10 @@ const logStore = useLogStore();
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 60vh;
+  justify-content: center;
+  min-height: 100vh;
   gap: 2rem;
-  padding: 2.5rem 1.5rem 1.5rem;
+  padding: 2rem 1.5rem 6vh;
 }
 
 /* Hero section */
@@ -117,13 +120,18 @@ const logStore = useLogStore();
 }
 
 .hero-logo {
-  width: min(360px, 80vw);
-  margin-bottom: 0.25rem;
-  filter: brightness(0) invert(0);
+  height: 3.5rem;
+  width: auto;
+  margin-bottom: 0.5rem;
 }
 
-:root.dark .hero-logo {
-  filter: brightness(0) invert(1);
+.hero-logo-dark,
+:root.dark .hero-logo-light {
+  display: none;
+}
+
+:root.dark .hero-logo-dark {
+  display: block;
 }
 
 .hero-subtitle {
@@ -168,9 +176,11 @@ const logStore = useLogStore();
   border-radius: 0.5rem;
   padding: 0.75rem;
   background: var(--surface-0);
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  /* header, text and links line up across the cards */
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 0.4rem;
   font-size: 0.75rem;
   color: var(--text-secondary);
   transition: border-color 0.2s;
@@ -203,7 +213,6 @@ const logStore = useLogStore();
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  margin-top: auto;
   padding-top: 0.25rem;
   border-top: 1px solid var(--border-color, #eee);
 }
@@ -212,8 +221,8 @@ const logStore = useLogStore();
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.7rem;
-  color: var(--color-primary-700, #bb6502);
+  font-size: 0.75rem;
+  color: var(--color-primary-700);
   text-decoration: none;
   padding: 0.2rem 0.35rem;
   border-radius: 0.25rem;
@@ -221,16 +230,16 @@ const logStore = useLogStore();
 }
 
 .info-links a:hover {
-  background-color: var(--color-primary-50, #fffeea);
-  color: var(--color-primary-800, #964f00);
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-800);
 }
 
 :root.dark .info-links a {
-  color: var(--color-primary-400, #ffd03d);
+  color: var(--color-primary-400);
 }
 
 :root.dark .info-links a:hover {
-  background-color: rgba(255, 187, 0, 0.1);
-  color: var(--color-primary-300, #ffe066);
+  background-color: rgba(55, 168, 219, 0.12);
+  color: var(--color-primary-300);
 }
 </style>

@@ -57,9 +57,11 @@ export default defineConfig({
           },
           compoundVariants: [
             {
+              // white on INAV blue, darker on hover, as in the Configurator
               color: "primary",
               variant: "solid",
-              class: "text-black",
+              class:
+                "text-white hover:bg-primary-600 active:bg-primary-600 dark:bg-primary-500 dark:hover:bg-primary-600",
             },
           ],
         },
@@ -127,21 +129,21 @@ export default defineConfig({
         name: pkg.displayName,
         short_name: pkg.productName,
         description: pkg.description,
-        theme_color: "#ffffff",
+        theme_color: "#3d3f3e",
         icons: [
           {
-            src: "/images/pwa/bf_icon_128.png",
+            src: "/images/pwa/inav_icon_128.png",
             sizes: "128x128",
             type: "image/png",
           },
           {
-            src: "/images/pwa/bf_icon_192.png",
+            src: "/images/pwa/inav_icon_192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/images/pwa/bf_icon_256.png",
-            sizes: "256x256",
+            src: "/images/pwa/inav_icon_512.png",
+            sizes: "512x512",
             type: "image/png",
           },
         ],
@@ -149,7 +151,7 @@ export default defineConfig({
           {
             action: "/",
             accept: {
-              "application/octet-stream": [".bbl", ".bfl"],
+              "application/octet-stream": [".bbl", ".bfl", ".txt"],
             },
           },
         ],

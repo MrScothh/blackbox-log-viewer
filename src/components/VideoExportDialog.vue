@@ -43,7 +43,7 @@
 
           <p v-if="hasFlightVideo" class="text-xs text-dimmed">
             If you experience problems with the background flight video being glitchy in the exported video,
-            <a href="https://github.com/betaflight/blackbox-tools/blob/master/Readme.md" target="_blank" rel="noopener noreferrer" class="underline">follow the instructions here</a>
+            <a href="https://github.com/iNavFlight/blackbox-log-viewer#flight-video-wont-load-or-jumpy-flight-video-upon-export" target="_blank" rel="noopener noreferrer" class="underline">follow the instructions here</a>
             to re-encode your flight video.
           </p>
         </template>

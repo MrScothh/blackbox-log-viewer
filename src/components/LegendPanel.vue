@@ -152,7 +152,6 @@
       variant="solid"
       block
       size="xs"
-      class="text-black"
       label="Graph setup"
       @click="openGraphConfig"
     />
