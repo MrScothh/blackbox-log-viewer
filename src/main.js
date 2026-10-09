@@ -142,7 +142,8 @@ function BlackboxLogViewer() {
       graphStore.activeGraphConfig,
       canvas,
       stickCanvas,
-      craftCanvas,
+      // by id: the grapher may have swapped the element for a fresh one (see craftCanvasFor)
+      document.getElementById("craftCanvas"),
       analyserCanvas,
       userSettings,
     );

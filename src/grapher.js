@@ -8,6 +8,8 @@ import {
 } from "./flightlog_fielddefs";
 import { Craft2D } from "./craft_2d";
 import { Craft3D } from "./craft_3d";
+import { CraftWing2D } from "./craft_wing.js";
+import { isInavFixedWingLog } from "./inav_graphs.js";
 import { FlightLogAnalyser } from "./graph_spectrum";
 import { LapTimer } from "./laptimer";
 import { GraphConfig } from "./graph_config";
@@ -75,6 +77,7 @@ export function FlightLogGrapher(
     sticks = null,
     craft3D = null,
     craft2D = null,
+    craftWing = null,
     analyser = null /* define a new spectrum analyser */,
     watermarkLogo /* Watermark feature */;
   this.onSeek = null;
@@ -862,7 +865,9 @@ export function FlightLogGrapher(
 
     const craftSize = canvas.height * (Number.parseInt(options.craft.size, 10) / 100);
 
-    if (craft2D) {
+    if (craftWing) {
+      craftWing.resize(craftSize, craftSize);
+    } else if (craft2D) {
       craft2D.resize(craftSize, craftSize);
     } else if (craft3D) {
       craft3D.resize(craftSize, craftSize);
@@ -1018,7 +1023,9 @@ export function FlightLogGrapher(
           );
         }
 
-        if (options.craftType === "3D") {
+        if (craftWing) {
+          craftWing.render(centerFrame, flightLog.getMainFieldIndexes());
+        } else if (options.craftType === "3D") {
           craft3D.render(centerFrame, flightLog.getMainFieldIndexes());
         } else if (options.craftType === "2D") {
           craft2D.render(centerFrame, flightLog.getMainFieldIndexes());
@@ -1123,16 +1130,34 @@ export function FlightLogGrapher(
     flightLog.setFieldSmoothing(smoothing);
   };
 
+  // A canvas keeps the kind of context it first gave out, so a WebGL craft and a 2D one cannot follow each other on
+  // it (a plane log opened after a quad log): switching kind swaps in a fresh copy of the element
+  const craftCanvasFor = function (kind) {
+    if (craftCanvas.dataset.context && craftCanvas.dataset.context !== kind) {
+      const fresh = craftCanvas.cloneNode(false);
+      craftCanvas.replaceWith(fresh);
+      craftCanvas = fresh;
+    }
+    craftCanvas.dataset.context = kind;
+    return craftCanvas;
+  };
+
   this.initializeCraftModel = function () {
     // Ensure craftType is a valid value
     if (!["2D", "3D"].includes(options.craftType)) {
       options.craftType = defaultOptions.craftType;
     }
 
+    // INAV planes: no motor layout to draw, see craft_wing.js
+    if (craftCanvas && isInavFixedWingLog(flightLog)) {
+      craftWing = new CraftWing2D(flightLog, craftCanvasFor("2d"));
+      return;
+    }
+
     if (options.craftType === "3D") {
       if (craftCanvas) {
         try {
-          craft3D = new Craft3D(flightLog, craftCanvas, idents.motorColors);
+          craft3D = new Craft3D(flightLog, craftCanvasFor("webgl"), idents.motorColors);
         } catch {
           //WebGL not supported, fall back to 2D rendering
           options.craftType = "2D";
@@ -1144,7 +1169,7 @@ export function FlightLogGrapher(
     }
 
     if (options.craftType === "2D") {
-      craft2D = new Craft2D(flightLog, craftCanvas, idents.motorColors);
+      craft2D = new Craft2D(flightLog, craftCanvasFor("2d"), idents.motorColors);
     }
   };
 
