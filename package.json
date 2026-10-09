@@ -60,6 +60,6 @@
     "@rollup/plugin-terser": "^1.0.0"
   },
   "engines": {
-    "node": "24.x"
+    "node": ">=22.12"
   }
 }

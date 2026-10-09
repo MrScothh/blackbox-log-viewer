@@ -1,5 +1,5 @@
-// Desktop packages with electron-forge, as INAV Configurator builds its own. The app is the web build in dist/
-// (npm run desktop:make builds it first with --mode desktop) plus electron/; nothing else goes into the package.
+// Packages dist/ (built with --mode desktop) and electron/ only, with electron-forge as INAV Configurator
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -21,7 +21,39 @@ export default {
     executableName: "inav-blackbox-explorer",
     icon: path.join(here, "assets", "desktop", "inav"),
     asar: true,
+    // offered under Open With in the Finder, without becoming the default for every .txt
+    extendInfo: {
+      CFBundleDocumentTypes: [
+        {
+          CFBundleTypeName: "Blackbox log",
+          CFBundleTypeRole: "Viewer",
+          LSHandlerRank: "Alternate",
+          CFBundleTypeExtensions: ["txt", "bbl", "bfl"],
+        },
+      ],
+    },
     ignore: (file) => !packaged(file.replaceAll("\\", "/")),
+  },
+  hooks: {
+    // the names INAV Configurator gives its packages; without it both MacOS dmgs are INAV-Blackbox-Explorer.dmg
+    postMake: async (forgeConfig, makeResults) => {
+      for (const result of makeResults) {
+        const base =
+          `INAV-Blackbox-Explorer_${result.platform}_${result.arch}_${result.packageJSON.version}`
+            .replace("_win32_ia32", "_Win32")
+            .replace("_win32_x64", "_Win64")
+            .replace("_darwin", "_MacOS");
+        result.artifacts = result.artifacts.map((artifact) => {
+          const renamed = path.join(
+            path.dirname(artifact),
+            base + path.extname(artifact),
+          );
+          fs.renameSync(artifact, renamed);
+          return renamed;
+        });
+      }
+      return makeResults;
+    },
   },
   makers: [
     {

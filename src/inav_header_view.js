@@ -1,5 +1,4 @@
-// The INAV log header for the header dialog: sections with INAV's names, units and per-release lookup tables.
-// Units are those blackbox.c writes (blackboxWriteSysinfo), the same from INAV 7 to 10.
+// Units as blackbox.c's blackboxWriteSysinfo writes them, the same from INAV 7 to 10
 import { inavTablesFor } from "./inav_header.js";
 
 function param(name, value) {
@@ -201,8 +200,7 @@ export function inavHeaderView(s) {
     param("Yaw LPF", offOr(s.yaw_lpf_hz, "Hz")),
   ]);
 
-  // vbat_scale is logged divided by 10, cell voltages in tenths of a volt, the reference in hundredths;
-  // the current sensor scale is in 0.1 mV/A
+  // As logged: vbat_scale / 10, cells in 0.1 V, the reference in 0.01 V, the current scale in 0.1 mV/A
   const battery = only([
     param("Voltage Scale", num(s.vbatscale * 10)),
     param("Cell Min", num(s.vbatmincellvoltage, "V", 10, 1)),

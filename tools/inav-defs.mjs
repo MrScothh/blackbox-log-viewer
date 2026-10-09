@@ -1,8 +1,4 @@
-// Generates src/inav_defs.js from an INAV firmware checkout, so the names of modes, states and navigation phases
-// follow the firmware instead of being copied by hand.
-//     node tools/inav-defs.mjs PATH_TO_INAV_REPO [GIT_REV]      (default rev: HEAD)
-// Every enum below only grows across INAV versions (values are never reused), so the newest tables also decode
-// older logs; names that no longer exist are kept in LEGACY.
+// Regenerates src/inav_defs.js from INAV's sources: node tools/inav-defs.mjs PATH_TO_INAV_REPO [GIT_REV]
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -156,9 +152,7 @@ tables.INAV_HW_HEALTH_STATUS = table(
   },
 );
 
-// settings.yaml lookup tables and the feature names did get renumbered between releases (a magnetometer driver
-// inserted in 9.0 moved the ones after it, MOTOR_STOP became GEOZONE in 8.0), so they are kept per release and
-// picked by the log's firmware version
+// Renumbered between releases (magnetometers in 9.0, MOTOR_STOP to GEOZONE in 8.0): kept per release
 const VERSIONED = [
   ["7.0.0", "7.1.2"],
   ["8.0.0", "8.0.1"],

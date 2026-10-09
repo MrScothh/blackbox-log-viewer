@@ -67,8 +67,7 @@ function decodeInavUnits(flightLog, fieldName, value, settings) {
     case "rcData":
     case "servo":
       return `${value} us`;
-    // PID terms and navigation controller outputs are in mixer units (500 = 500 us of motor command), unitless
-    // as the INAV viewer always showed them
+    // Mixer units (500 = 500 us of motor command), unitless as the INAV viewer always showed them
     case "axisP":
     case "axisI":
     case "axisD":
@@ -115,7 +114,7 @@ function decodeInavUnits(flightLog, fieldName, value, settings) {
     case "wind":
       // the vertical component stays in m/s whatever the speed unit
       return axis === "2" ? `${(value / 100).toFixed(2)} m/s` : speed(value / 100, settings);
-    case "airSpeed":
+    case "AirSpeed":
       return speed(value / 100, settings);
     case "navTgtHdg":
       return `${(value / 100).toFixed(1)} °`;
@@ -123,9 +122,10 @@ function decodeInavUnits(flightLog, fieldName, value, settings) {
       return `${(value / 10).toFixed(1)} °`;
     case "GPS_altitude":
       return altitude(value, settings);
+    case "escTemperature":
+      return `${value} °C`;
     case "IMUTemperature":
     case "baroTemperature":
-    case "escTemperature":
     case "sens0Temp":
     case "sens1Temp":
     case "sens2Temp":
@@ -138,6 +138,9 @@ function decodeInavUnits(flightLog, fieldName, value, settings) {
       return value === -1250 ? "" : `${(value / 10).toFixed(1)} °C`;
     case "escRPM":
       return `${value} rpm`;
+    // INAV's debug modes share names with Betaflight's but not their units: as logged
+    case "debug":
+      return `${value}`;
     case "rxUpdateRate":
       return `${value} Hz`;
     default:
@@ -171,4 +174,40 @@ export function decodeInavField(flightLog, fieldName, value, settings) {
     default:
       return undefined;
   }
+}
+
+// Graph scales in the legend's units (raw / scale); fields not listed keep Betaflight's conversion
+const INAV_SCALE = {
+  rcCommand: 1,
+  axisP: 1,
+  axisI: 1,
+  axisD: 1,
+  axisF: 1,
+  axisSum: 1,
+  vbat: 100,
+  sagCompensatedVBat: 100,
+  amperage: 100,
+  BaroAlt: 100,
+  navPos: 100,
+  navTgtPos: 100,
+  navSurf: 100,
+  terrainAGL: 100,
+  terrainAMSL: 100,
+  navTgtHdg: 100,
+  attitude: 10,
+  GPS_altitude: 1,
+  IMUTemperature: 10,
+  baroTemperature: 10,
+  escTemperature: 1,
+  debug: 1,
+};
+
+// value in graph units (toFriendly) or back in log units, or undefined for Betaflight's conversion
+export function convertInavField(fieldName, toFriendly, value) {
+  const base = fieldName.replace(/\[\d+\]$/, "");
+  const scale = /^sens\dTemp$/.test(base) ? 10 : INAV_SCALE[base];
+  if (scale === undefined) {
+    return undefined;
+  }
+  return toFriendly ? value / scale : value * scale;
 }

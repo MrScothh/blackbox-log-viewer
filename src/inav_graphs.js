@@ -1,6 +1,4 @@
-// Example graphs for INAV logs, built on the fields INAV writes. INAV logs the fw* navigation controllers only on
-// fixed wing platforms and the mc* ones only on multirotors, which tells the craft apart (the header has no
-// platform line).
+// The header has no platform line: INAV logs the fw* navigation fields on planes only, the mc* ones on multirotors
 const GRAPHS = [
   { label: "Motors", fields: ["motor[all]"] },
   { label: "Servos", fields: ["servo[all]"] },

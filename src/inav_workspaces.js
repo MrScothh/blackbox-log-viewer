@@ -1,6 +1,4 @@
-// Workspace presets for INAV logs, one for multirotors and one for planes, in the slots 1 to 9 and 0 of the workspace
-// menu. Fields are given by name only: their scales follow the log's own data, and a field the log does not have is
-// left out (GraphConfig.extendFields).
+// Fields by name only: scales follow each log, and fields a log does not have are left out
 const field = (name) => ({ name, color: -1 });
 const graph = (label, names, height = 1) => ({ label, height, fields: names.map(field) });
 const axes = ["roll", "pitch", "yaw"];

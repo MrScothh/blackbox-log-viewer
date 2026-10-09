@@ -1,5 +1,4 @@
-// Debug API (window.inavDebug): drives the viewer from a script, e.g. through Chrome's remote debugging, without the
-// UI. Only in a dev build or with ?debug in the URL; there alert() and uncaught errors are collected, not shown.
+// window.inavDebug drives the viewer from scripts; only in a dev build or with ?debug, where alerts are collected
 import pinia from "./pinia_instance.js";
 import { useAppStore } from "./stores/app.js";
 import { useLogStore } from "./stores/log.js";

@@ -1475,8 +1475,7 @@ export function FlightLogParser(logData) {
     return run === length;
   }
 
-  // Parse the frame whose marker is at frameStart without predictions and report whether it ends where another
-  // frame or the log ends; the stream is left where it was
+  // Without predictions, so it can run ahead of the history; the stream position is restored
   const frameEndsOnMarker = (frameStart, ninthFieldAbsent) => {
     const marker = String.fromCodePoint(stream.data[frameStart]);
     if (!getFrameType(marker)) {
@@ -1506,8 +1505,7 @@ export function FlightLogParser(logData) {
     return { ends, end };
   };
 
-  // How many frames in a row, from frameStart, end where another frame or the log begins, up to max. A P frame
-  // passes with either reading of the ninth value; an event frame ends the walk, as it is not measured
+  // A P frame passes with either reading of the ninth value; an event frame ends the walk, as it is not measured
   const framesEndingOnMarkers = (frameStart, max) => {
     let count = 0;
     while (count < max) {
@@ -1530,10 +1528,7 @@ export function FlightLogParser(logData) {
     return count;
   };
 
-  // Read the P frame whose body starts at the stream position with the ninth value present or absent: keep the
-  // reading that ends on the next frame's marker. When both do, the wrong one ends a value early or late on a byte
-  // that only looks like a marker: keep the one after which more frames in a row end on markers, and if that is
-  // level too, the reading this log has needed more often (same rules as blackbox-tools)
+  // When both readings end on a marker, one did so on a byte that only looks like one: rules of blackbox-tools#102
   const inavNinthFieldLooksAbsent = () => {
     const frameStart = stream.pos - 1;
     inavNinthFieldUnsure = false;

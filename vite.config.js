@@ -8,8 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-// Dev server only: GET /__debug/file?path=... hands a local log to window.inavDebug.loadUrl(), for files inside
-// DEBUG_LOG_ROOT (default: this folder)
+// Dev server only: /__debug/file?path= hands logs under DEBUG_LOG_ROOT to window.inavDebug.loadUrl()
 function debugFiles() {
   return {
     name: "inav-debug-files",

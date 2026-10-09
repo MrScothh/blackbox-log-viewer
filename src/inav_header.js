@@ -11,8 +11,7 @@ export function parseInavHeaderValue(text) {
   return text;
 }
 
-// The spectrum analyser draws filter cutoffs from Betaflight's header names: INAV's values under those names.
-// dterm_lpf_hz and yaw_lpf_hz already share them; gyro_lpf_type exists in INAV 7 logs only.
+// The spectrum analyser reads Betaflight's header names; dterm_lpf_hz and yaw_lpf_hz are shared already
 export function inavAnalyserFilters(sysConfig) {
   return {
     gyro_lowpass_hz: sysConfig.gyro_lpf_hz ?? null,

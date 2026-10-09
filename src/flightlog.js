@@ -650,8 +650,7 @@ export function FlightLog(logData) {
     { attitude, imuQuaternion, gyroADC, accSmooth, magADC, chunkIMU, sysConfig },
   ) => {
     if (attitude) {
-      // INAV logs its own estimate in decidegrees, same axes and signs as the ones computed below, with the
-      // heading from compass or GPS rather than integrated gyro
+      // INAV's own estimate, same axes and signs as below, with the heading from compass or GPS, not integrated gyro
       const toRadians = Math.PI / 1800;
       destFrame[fieldIndex++] = srcFrame[attitude[0]] * toRadians;
       destFrame[fieldIndex++] = srcFrame[attitude[1]] * toRadians;
@@ -837,11 +836,13 @@ export function FlightLog(logData) {
     numSatIndex,
   ) => {
     const numSat = numSatIndex ? srcFrame[numSatIndex] : 0;
+    // INAV logs GPS altitude in metres, Betaflight in decimetres
+    const altitudeScale = this.getSysConfig().firmwareType === FIRMWARE_TYPE_INAV ? 1 : 10;
     if (numSat > 4) {
       const gpsCartesianCoords = gpsTransform.WGS_BS(
         srcFrame[gpsCoord[0]] / 10000000,
         srcFrame[gpsCoord[1]] / 10000000,
-        srcFrame[gpsCoord[2]] / 10,
+        srcFrame[gpsCoord[2]] / altitudeScale,
       );
       destFrame[fieldIndex++] = gpsCartesianCoords.x;
       destFrame[fieldIndex++] = gpsCartesianCoords.y;
@@ -1701,6 +1702,10 @@ FlightLog.prototype.PctPhysicalTorcMotorRaw = function (value) {
 };
 
 FlightLog.prototype.isDigitalProtocol = function () {
+  // INAV logs motors in the PWM range whatever the protocol: writeMotors converts to DSHOT afterwards
+  if (this.getSysConfig().firmwareType === FIRMWARE_TYPE_INAV) {
+    return false;
+  }
   let digitalProtocol;
   switch (FAST_PROTOCOL[this.getSysConfig().fast_pwm_protocol]) {
     case "PWM":

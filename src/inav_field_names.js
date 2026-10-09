@@ -1,5 +1,4 @@
-// Friendly names of INAV's log fields, in the style of Betaflight's (flightlog_fields_presenter.js). Servos are
-// numbered from 0 as in the Configurator's Outputs tab and in smix; motors from 1 as in Betaflight's names.
+// Servos numbered from 0 as in the Configurator and smix, motors from 1 as in Betaflight's names
 const AXES = ["roll", "pitch", "yaw"];
 const NEU = ["north", "east", "up"];
 const XYZ = ["X", "Y", "Z"];

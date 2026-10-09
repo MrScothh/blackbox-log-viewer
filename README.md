@@ -49,10 +49,10 @@ keyboard icon at the top right lists the keyboard shortcuts.
 
 ### Graphs and workspaces
 
-**Graph Setup**, under the legend, chooses which fields are plotted. **Add graph** offers ready-made graphs for INAV:
+**Graph setup**, under the legend, chooses which fields are plotted. **Add graph** offers ready-made graphs for INAV:
 motors and servos, gyro and setpoint, the PID terms of each axis, attitude, battery, altitude and speeds with their
-navigation targets, the navigation controllers, airspeed, wind, GPS and more. A plane opens on its servos and gyros, a
-multirotor on its motors and gyros.
+navigation targets, the navigation controllers, airspeed, wind, GPS and more. The first time, a plane opens on its
+servos and gyros and a multirotor on its motors and gyros; after that the explorer keeps the graphs you last used.
 
 A workspace is a set of graphs kept in one of ten slots, switched with the keys **1** to **0** (**Shift** with the key
 saves the current graphs there). The **Workspaces** menu

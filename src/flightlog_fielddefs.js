@@ -269,8 +269,7 @@ const BETAFLIGHT_FILTER_TYPE = makeReadOnly(["PT1", "BIQUAD", "PT2", "PT3"]);
 export let FILTER_TYPE = BETAFLIGHT_FILTER_TYPE;
 
 export let DEBUG_MODE = [];
-// Set while an INAV log is open: its debug modes share some names with Betaflight's but not their fields, and
-// its fields get INAV's names
+// INAV's debug modes reuse some of Betaflight's names for other fields, and its fields have names of their own
 export let LOG_IS_INAV = false;
 
 export const DEBUG_MODE_COMPLETE = makeReadOnly([
@@ -520,6 +519,9 @@ export const THROTTLE_LIMIT_TYPE = makeReadOnly(["OFF", "SCALE", "CLIP"]);
 export function adjustFieldDefsList(firmwareType, firmwareVersion) {
   LOG_IS_INAV = false;
   FILTER_TYPE = BETAFLIGHT_FILTER_TYPE;
+  // an INAV log before this one left INAV's lists here, and not every branch below sets them
+  ACC_HARDWARE = [];
+  MAG_HARDWARE = [];
   if (firmwareType === FIRMWARE_TYPE_INAV) {
     // INAV numbers these its own way and renumbered some between releases: tables of the log's release
     const tables = inavTablesFor(firmwareVersion);

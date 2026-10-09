@@ -1,6 +1,4 @@
-// Craft view for INAV fixed wing logs: the log has no servo mixer, so instead of a model with moving surfaces it
-// shows what the log does say, an artificial horizon from INAV's attitude, a throttle bar per motor and each servo's
-// travel from centre.
+// The log has no servo mixer: attitude, throttle and each servo's travel rather than moving control surfaces
 const SKY = "rgba(55, 168, 219, 0.75)";
 const GROUND = "rgba(150, 105, 60, 0.75)";
 const INK = "rgba(255, 255, 255, 0.9)";

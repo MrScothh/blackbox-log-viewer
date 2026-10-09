@@ -228,7 +228,13 @@ GraphConfig.getDefaultSmoothingForField = function (flightLog, fieldName) {
 GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
   const sysConfig = flightLog.getSysConfig();
 
+  const isInav = sysConfig.firmwareType === FIRMWARE_TYPE_INAV;
+
   const maxDegreesSecond = function (scale) {
+    // INAV logs its rates in tens of degrees per second
+    if (isInav && sysConfig.rates) {
+      return Math.max(...sysConfig.rates.map((rate) => rate * 10)) * scale;
+    }
     switch (sysConfig["rates_type"]) {
       case RATES_TYPE.indexOf("ACTUAL"):
       case RATES_TYPE.indexOf("QUICK"):
@@ -355,7 +361,9 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
       fieldName.match(/^axisError\[/) || // Gyro, Gyro Scaled, RC Command Scaled and axisError
       fieldName.match(/^rcCommands\[/) || // These use the same scaling as they are in the
       fieldName.match(/^gyroADC\[/) || // same range.
-      fieldName.match(/^gyroUnfilt\[/)
+      fieldName.match(/^gyroUnfilt\[/) ||
+      fieldName.match(/^axisRate\[/) || // INAV's setpoint and unfiltered gyro
+      fieldName.match(/^gyroRaw\[/)
     ) {
       return {
         power: 1,
@@ -364,6 +372,9 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
           max: maxDegreesSecond(gyroScaleMargin),
         },
       };
+    } else if (isInav && fieldName.match(/^(axis[PIDF]|axisSum|rcCommand)\[[012]\]$/)) {
+      // mixer units for the PID terms, stick deflection around 0 for the commands: 500 is full scale
+      return { power: 1, MinMax: { min: -500, max: 500 } };
     } else if (
       fieldName.match(/^axis.+\[/) ||
       fieldName === "GPS_speed"

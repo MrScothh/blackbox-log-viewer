@@ -1130,8 +1130,7 @@ export function FlightLogGrapher(
     flightLog.setFieldSmoothing(smoothing);
   };
 
-  // A canvas keeps the kind of context it first gave out, so a WebGL craft and a 2D one cannot follow each other on
-  // it (a plane log opened after a quad log): switching kind swaps in a fresh copy of the element
+  // A canvas keeps the kind of context it first gave out: a plane after a quad (2D after WebGL) needs a new one
   const craftCanvasFor = function (kind) {
     if (craftCanvas.dataset.context && craftCanvas.dataset.context !== kind) {
       const fresh = craftCanvas.cloneNode(false);

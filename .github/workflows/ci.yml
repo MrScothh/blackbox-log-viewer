@@ -136,6 +136,8 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Build Windows
+        # in PowerShell a failed first command would not fail the step
+        shell: bash
         run: |
           npx vite build --mode desktop
           npx electron-forge make --platform=win32 --arch=${{ matrix.arch }}

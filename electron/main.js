@@ -1,5 +1,4 @@
-// Desktop app: the web build (dist/, built with --mode desktop) served on app://, so that its absolute paths resolve
-// as they do on the web. Logs opened from the system ("Open with", double click) are handed to the page.
+// The web build served on app://, so that its absolute paths resolve as they do on the web
 import {
   app,
   BrowserWindow,
@@ -94,6 +93,17 @@ if (!firstInstance) {
     }
   });
 
+  // MacOS hands files opened from the Finder over as events, also at launch before the app is ready
+  const finderFiles = [];
+  app.on("open-file", (event, file) => {
+    event.preventDefault();
+    if (app.isReady()) {
+      openWindow(file);
+    } else {
+      finderFiles.push(file);
+    }
+  });
+
   app.on("browser-window-created", (_event, win) => setUpWindow(win));
 
   ipcMain.on("viewer-ready", (event) => {
@@ -120,7 +130,11 @@ if (!firstInstance) {
     if (process.platform !== "darwin") {
       Menu.setApplicationMenu(null);
     }
-    openWindow(logFileIn(process.argv));
+    const files = [logFileIn(process.argv), ...finderFiles].filter(Boolean);
+    openWindow(files.shift());
+    for (const file of files) {
+      openWindow(file);
+    }
   });
 
   app.on("window-all-closed", () => {

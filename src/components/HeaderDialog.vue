@@ -234,7 +234,8 @@ const filteredSc = computed(() => {
   if (hiddenFields.value.size === 0) {
     return sc.value;
   }
-  const result = { ...sc.value };
+  // keeps the parser's defaults, which some handlers fill in place (rc_expo of an INAV log)
+  const result = Object.assign(Object.create(Object.getPrototypeOf(sc.value)), sc.value);
   for (const key of hiddenFields.value) {
     delete result[key];
     for (const alias of INAV_HEADER_KEYS[key] ?? []) {
