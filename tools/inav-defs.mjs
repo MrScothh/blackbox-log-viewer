@@ -178,6 +178,7 @@ const SETTINGS_TABLES = [
   "motor_pwm_protocol",
   "debug_modes",
   "filter_type",
+  "gyro_lpf",
   "filter_type_full",
   "current_sensor",
   "voltage_sensor",

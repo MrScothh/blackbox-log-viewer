@@ -257,6 +257,7 @@ export const INAV_HW_HEALTH_STATUS = Object.freeze([
 export const INAV_VERSIONED_TABLES = Object.freeze([
   {
     from: "7.0.0",
+    gyro_lpf: ["256HZ", "188HZ", "98HZ", "42HZ", "20HZ", "10HZ"],
     acc_hardware: [
       "NONE",
       "AUTO",

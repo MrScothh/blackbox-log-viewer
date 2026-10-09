@@ -47,7 +47,7 @@
       />
     </div>
 
-    <div class="overflow-y-auto flex-1 p-4 font-mono text-xs">
+    <div class="overflow-y-auto flex-1 p-4 text-xs tabular-nums">
       <!-- Pane columns: one pane per group, sortable for reordering -->
       <div
         ref="gridEl"
@@ -59,7 +59,7 @@
           v-for="group in visiblePanes"
           :key="group"
           :data-group="group"
-          class="break-inside-avoid mb-4"
+          class="break-inside-avoid mb-4 flow-root"
         >
             <UiBox :title="group">
               <template #title>
@@ -218,6 +218,7 @@ import {
   FIRMWARE_TYPE_BETAFLIGHT,
   FIRMWARE_TYPE_INAV,
 } from "../flightlog_fielddefs";
+import { inavHeaderView, INAV_HEADER_KEYS, INAV_HEADER_SECTIONS } from "../inav_header_view.js";
 
 const open = defineModel("open", { type: Boolean, default: false });
 const cols = ref(null);
@@ -236,6 +237,9 @@ const filteredSc = computed(() => {
   const result = { ...sc.value };
   for (const key of hiddenFields.value) {
     delete result[key];
+    for (const alias of INAV_HEADER_KEYS[key] ?? []) {
+      delete result[alias];
+    }
   }
   return result;
 });
@@ -243,6 +247,9 @@ const fwType = computed(() => sc.value.firmwareType);
 const fwVer = computed(() => sc.value.firmwareVersion || "0.0.0");
 const isBF = computed(() => fwType.value === FIRMWARE_TYPE_BETAFLIGHT);
 const isINAV = computed(() => fwType.value === FIRMWARE_TYPE_INAV);
+
+// INAV logs get their own sections, names and units
+const inav = computed(() => (isINAV.value ? inavHeaderView(filteredSc.value) : null));
 
 function gte(ver) {
   return semver.gte(fwVer.value, ver);
@@ -296,7 +303,7 @@ function formatParams(title, params) {
 }
 
 function copyToClipboard() {
-  const sections = [
+  const sections = inav.value ? inavClipboardSections() : [
     formatParams("PID Settings", allPids.value.map((r) => {
       const dMax = showDMax.value ? ` DMax=${r.dMax}` : "";
       return { name: r.label, value: `P=${r.p} I=${r.i} D=${r.d}${dMax} FF=${r.f}` };
@@ -316,6 +323,17 @@ function copyToClipboard() {
   ];
   const text = `${craftName.value}\n${revision.value}\n${boardInfo.value}\n\n${sections.filter(Boolean).join("\n")}`;
   navigator.clipboard.writeText(text);
+}
+
+function inavClipboardSections() {
+  const pids = formatParams("PID Settings", inav.value.pids.map((r) => (
+    { name: r.label, value: `P=${r.p ?? "-"} I=${r.i ?? "-"} D=${r.d ?? "-"} FF=${r.f ?? "-"}` }
+  )));
+  const groups = paneOrder.value
+    .filter((g) => inav.value.groups[g])
+    .map((g) => formatParams(g, inav.value.groups[g]));
+  const features = formatParams("Features", inav.value.features.map((f) => ({ name: f.name, value: "on" })));
+  return [pids, ...groups, features];
 }
 
 // --- Header ---
@@ -340,7 +358,7 @@ const boardInfo = computed(() =>
 // --- PID Tables ---
 
 const showDMax = computed(() => isBF.value && gte("4.0.0"));
-const allPids = computed(() => [
+const allPids = computed(() => inav.value ? inav.value.pids : [
   ...mainPids.value,
   ...baroPids.value,
   ...magPids.value,
@@ -830,6 +848,9 @@ const motorParams = computed(() => {
 
 const featuresList = computed(() => {
   const s = filteredSc.value;
+  if (inav.value) {
+    return inav.value.features;
+  }
   if (s.features == null) {
     return [];
   }
@@ -1003,7 +1024,7 @@ loadHiddenPrefs();
 // Group order for display
 const GROUP_ORDER = [
   "PID Settings", "PID Sliders", "PID Controller", "Feedforward", "Rates", "Rate Limits",
-  "Parameters", "Motor / ESC",
+  "Parameters", "Hardware", "Motor / ESC", "Battery",
   "Gyro Filters", "Dynamic Notch", "RPM Filter",
   "D-Term Filters", "RC Smoothing",
   "Features", "Disabled Fields",
@@ -1041,7 +1062,7 @@ function savePaneOrder() {
 }
 loadPaneOrder();
 
-const groupParamMap = computed(() => ({
+const groupParamMap = computed(() => inav.value ? inav.value.groups : ({
   "PID Sliders": pidSliderParams.value,
   "PID Controller": pidControllerParams.value,
   "Feedforward": feedforwardParams.value,
@@ -1255,6 +1276,7 @@ function formatHeaderValue(val) {
 
 const HEADER_SKIP_KEYS = new Set([
   "unknownHeaders",
+  "headerLines",
   "firmwareType",
   "Craft_name",
   "firmware",
@@ -1264,7 +1286,21 @@ const HEADER_SKIP_KEYS = new Set([
   "flightControllerVersion",
 ]);
 
+// INAV: the header lines exactly as logged, not the parser's sysConfig with its Betaflight defaults
+function buildInavGroupMap(lines) {
+  const groups = {};
+  for (const { name, value } of lines) {
+    const group = INAV_HEADER_SECTIONS[name] ?? "Parameters";
+    groups[group] ??= [];
+    groups[group].push({ name, value, group });
+  }
+  return groups;
+}
+
 function buildGroupMap(s) {
+  if (isINAV.value && s.headerLines?.length) {
+    return buildInavGroupMap(s.headerLines);
+  }
   const groups = {};
   for (const key of Object.keys(s)) {
     if (HEADER_SKIP_KEYS.has(key)) {

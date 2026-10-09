@@ -3,7 +3,7 @@
     :data="params"
     :columns="columns"
     :ui="{
-      thead: 'sr-only',
+      thead: 'hidden',
       base: 'w-full',
       td: 'py-0.5 px-1 text-xs',
       tr: 'border-b border-default',
