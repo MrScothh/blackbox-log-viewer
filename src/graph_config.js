@@ -139,6 +139,12 @@ export function GraphConfig(graphConfig) {
         const fields = this.extendFields(flightLog, field);
         newGraph.fields = newGraph.fields.concat(fields);
       }
+      // -1 asks for a palette colour: extendFields gives one to [all] fields only, the grapher would draw -1 as is
+      newGraph.fields.forEach((field, i) => {
+        if (field.color === -1) {
+          field.color = GraphConfig.PALETTE[i % GraphConfig.PALETTE.length].color;
+        }
+      });
 
       newGraphs.push(newGraph);
     }
