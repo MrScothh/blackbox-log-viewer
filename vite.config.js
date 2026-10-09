@@ -6,6 +6,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import pkg from "./package.json";
 import fs from "node:fs";
 import path from "node:path";
+import process from "node:process";
 
 // Dev server only: GET /__debug/file?path=... hands a local log to window.inavDebug.loadUrl(), for files inside
 // DEBUG_LOG_ROOT (default: this folder)
@@ -14,9 +15,13 @@ function debugFiles() {
     name: "inav-debug-files",
     apply: "serve",
     configureServer(server) {
-      const root = path.resolve(process.env.DEBUG_LOG_ROOT || process.cwd()).toLowerCase();
+      const root = path
+        .resolve(process.env.DEBUG_LOG_ROOT || process.cwd())
+        .toLowerCase();
       server.middlewares.use("/__debug/file", (req, res) => {
-        const file = path.resolve(new URL(req.url, "http://localhost").searchParams.get("path") || "");
+        const file = path.resolve(
+          new URL(req.url, "http://localhost").searchParams.get("path") || "",
+        );
         if (!file.toLowerCase().startsWith(root + path.sep)) {
           res.statusCode = 403;
           res.end("outside DEBUG_LOG_ROOT");
@@ -32,7 +37,6 @@ function debugFiles() {
     },
   };
 }
-
 
 export default defineConfig({
   build: {
