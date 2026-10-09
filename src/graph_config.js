@@ -1,5 +1,6 @@
 import { FlightLogFieldPresenter } from "./flightlog_fields_presenter";
-import { RATES_TYPE, DEBUG_MODE } from "./flightlog_fielddefs";
+import { RATES_TYPE, DEBUG_MODE, FIRMWARE_TYPE_INAV } from "./flightlog_fielddefs";
+import { inavExampleGraphs } from "./inav_graphs";
 import { escapeRegExp } from "./tools";
 
 export function GraphConfig(graphConfig) {
@@ -1569,7 +1570,9 @@ GraphConfig.getMinMaxForFieldDuringAllTime = function (flightLog, fieldName) {
  * Supply an array of strings `graphNames` to only fetch the graph with the given names.
  */
 GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
-  const result = [];
+  if (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_INAV) {
+    return exampleGraphConfigs(inavExampleGraphs(flightLog), graphNames);
+  }
   const EXAMPLE_GRAPHS = [];
 
   if (!flightLog.isFieldDisabled().MOTORS) {
@@ -1654,6 +1657,11 @@ GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
     });
   }
 
+  return exampleGraphConfigs(EXAMPLE_GRAPHS, graphNames);
+};
+
+function exampleGraphConfigs(EXAMPLE_GRAPHS, graphNames) {
+  const result = [];
   for (const srcGraph of EXAMPLE_GRAPHS) {
     const destGraph = {
       label: srcGraph.label,
@@ -1689,4 +1697,4 @@ GraphConfig.getExampleGraphConfigs = function (flightLog, graphNames) {
   }
 
   return result;
-};
+}

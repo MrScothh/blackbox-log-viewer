@@ -4,6 +4,8 @@ import { MapGrapher } from "./graph_map.js";
 import { FlightLogGrapher } from "./grapher.js";
 import { Configuration, ConfigurationDefaults } from "./configuration.js";
 import { GraphConfig } from "./graph_config.js";
+import { inavDefaultGraphNames } from "./inav_graphs.js";
+import { FIRMWARE_TYPE_INAV } from "./flightlog_fielddefs.js";
 import { SeekBar } from "./seekbar.js";
 import ctzsnoozeWorkspace from "./ws_ctzsnooze.json";
 import supaflyWorkspace from "./ws_supafly.json";
@@ -149,6 +151,15 @@ function BlackboxLogViewer() {
     setVideoInTime(false);
     setVideoOutTime(false);
 
+    // only now is the log's header read: the defaults depend on its firmware and fields
+    if (!graphStore.graphConfig) {
+      graphStore.graphConfig = GraphConfig.getExampleGraphConfigs(
+        logStore.flightLog,
+        logStore.flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_INAV
+          ? inavDefaultGraphNames(logStore.flightLog)
+          : ["Motors", "Gyros"],
+      );
+    }
     graphStore.activeGraphConfig.adaptGraphs(logStore.flightLog, graphStore.graphConfig);
 
     graph.onSeek = function (offset) {
@@ -248,13 +259,6 @@ function BlackboxLogViewer() {
           `Sorry, an error occurred while trying to open this log:\n\n${err}`,
         );
         return;
-      }
-
-      if (!graphStore.graphConfig) {
-        graphStore.graphConfig = GraphConfig.getExampleGraphConfigs(logStore.flightLog, [
-          "Motors",
-          "Gyros",
-        ]);
       }
 
       renderLogFileInfo(file);
