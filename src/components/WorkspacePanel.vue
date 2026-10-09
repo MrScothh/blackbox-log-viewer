@@ -74,14 +74,14 @@ const workspaceItems = computed(() => {
 
   const presetItems = [
     {
-      label: "Preset: Ctzsnooze",
+      label: "Preset: INAV multirotor",
       icon: "i-lucide-layout-template",
       onSelect() {
         emit("apply-default", 1);
       },
     },
     {
-      label: "Preset: SupaflyFPV",
+      label: "Preset: INAV fixed wing",
       icon: "i-lucide-layout-template",
       onSelect() {
         emit("apply-default", 2);

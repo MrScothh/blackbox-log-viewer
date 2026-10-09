@@ -10,7 +10,7 @@ import {
   FIRMWARE_TYPE_INAV,
 } from "./flightlog_fielddefs";
 import { ArrayDataStream } from "./datastream";
-import { parseInavHeaderValue } from "./inav_header.js";
+import { inavAnalyserFilters, parseInavHeaderValue } from "./inav_header.js";
 import "./decoders";
 import {
   hexToFloat,
@@ -1808,6 +1808,9 @@ export function FlightLogParser(logData) {
       this.sysConfig.firmwareType,
       this.sysConfig.firmwareVersion,
     );
+    if (this.sysConfig.firmwareType === FIRMWARE_TYPE_INAV) {
+      Object.assign(this.sysConfig, inavAnalyserFilters(this.sysConfig));
+    }
     FlightLogFieldPresenter.adjustDebugDefsList(
       this.sysConfig.firmwareType,
       this.sysConfig.firmwareVersion,

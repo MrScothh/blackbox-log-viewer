@@ -265,7 +265,8 @@ export const RC_SMOOTHING_DEBUG_AXIS = makeReadOnly([
   "THROTTLE",
 ]);
 
-export const FILTER_TYPE = makeReadOnly(["PT1", "BIQUAD", "PT2", "PT3"]);
+const BETAFLIGHT_FILTER_TYPE = makeReadOnly(["PT1", "BIQUAD", "PT2", "PT3"]);
+export let FILTER_TYPE = BETAFLIGHT_FILTER_TYPE;
 
 export let DEBUG_MODE = [];
 // Set while an INAV log is open: its debug modes share some names with Betaflight's but not their fields, and
@@ -518,6 +519,7 @@ export const THROTTLE_LIMIT_TYPE = makeReadOnly(["OFF", "SCALE", "CLIP"]);
 
 export function adjustFieldDefsList(firmwareType, firmwareVersion) {
   LOG_IS_INAV = false;
+  FILTER_TYPE = BETAFLIGHT_FILTER_TYPE;
   if (firmwareType === FIRMWARE_TYPE_INAV) {
     // INAV numbers these its own way and renumbered some between releases: tables of the log's release
     const tables = inavTablesFor(firmwareVersion);
@@ -525,6 +527,8 @@ export function adjustFieldDefsList(firmwareType, firmwareVersion) {
     DEBUG_MODE = makeReadOnly(tables.debug_modes.slice(0));
     ACC_HARDWARE = makeReadOnly(tables.acc_hardware.slice(0));
     MAG_HARDWARE = makeReadOnly(tables.mag_hardware.slice(0));
+    // starts like Betaflight's list; INAV 8 added LULU
+    FILTER_TYPE = makeReadOnly(tables.filter_type_full.slice(0));
     // flightModeFlags holds INAV's RC modes (boxId bits 0-31)
     FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(INAV_RC_MODE_NAMES.slice(0, 32).map((n) => n ?? ""));
     return;

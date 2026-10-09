@@ -7,8 +7,7 @@ import { GraphConfig } from "./graph_config.js";
 import { inavDefaultGraphNames } from "./inav_graphs.js";
 import { FIRMWARE_TYPE_INAV } from "./flightlog_fielddefs.js";
 import { SeekBar } from "./seekbar.js";
-import ctzsnoozeWorkspace from "./ws_ctzsnooze.json";
-import supaflyWorkspace from "./ws_supafly.json";
+import { INAV_FIXED_WING_WORKSPACES, INAV_MULTIROTOR_WORKSPACES } from "./inav_workspaces.js";
 import { FlightLog } from "./flightlog.js";
 import {
   stringTimetoMsec,
@@ -350,7 +349,7 @@ function BlackboxLogViewer() {
       if (item) {
         workspaceStore.workspaceGraphConfigs = upgradeWorkspaceFormat(item);
       } else {
-        workspaceStore.workspaceGraphConfigs = structuredClone(ctzsnoozeWorkspace);
+        workspaceStore.workspaceGraphConfigs = structuredClone(INAV_MULTIROTOR_WORKSPACES);
       }
     });
 
@@ -639,7 +638,7 @@ function BlackboxLogViewer() {
     };
     workspaceStore.saveWorkspace = (id, title) => onSaveWorkspace(id, title);
     workspaceStore.applyDefaultWorkspace = (index) => {
-      const presets = [null, structuredClone(ctzsnoozeWorkspace), structuredClone(supaflyWorkspace)];
+      const presets = [null, structuredClone(INAV_MULTIROTOR_WORKSPACES), structuredClone(INAV_FIXED_WING_WORKSPACES)];
       if (presets[index]) {
         onSwitchWorkspace(presets[index], 1);
       }
