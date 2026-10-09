@@ -8,8 +8,10 @@ import {
   FFT_CALC_STEPS,
   FIRMWARE_TYPE_BETAFLIGHT,
   FIRMWARE_TYPE_CLEANFLIGHT,
+  FIRMWARE_TYPE_INAV,
 } from "./flightlog_fielddefs";
 import { formatTime } from "./tools";
+import { decodeInavField } from "./inav_presenter.js";
 import { useSettingsStore } from "./stores/settings.js";
 
 export function FlightLogFieldPresenter() {
@@ -1628,6 +1630,13 @@ FlightLogFieldPresenter.decodeFieldToFriendly = function (
   const { userSettings } = useSettingsStore();
   if (value === undefined) {
     return "";
+  }
+
+  if (flightLog?.getSysConfig().firmwareType === FIRMWARE_TYPE_INAV) {
+    const inavText = decodeInavField(fieldName, value);
+    if (inavText !== undefined) {
+      return inavText;
+    }
   }
 
   const highResolutionScale =
