@@ -153,6 +153,36 @@ export function installDebugApi() {
       return out;
     },
 
+    // Distinct values of each field over the whole log, with the first time each appears and how it is shown
+    distinct(names, limit = 30) {
+      const f = flightLog();
+      const out = {};
+      const indexes = names.map((n) => [n, f.getMainFieldIndexByName(n)]).filter(([, i]) => i !== undefined);
+      for (const [name] of indexes) {
+        out[name] = new Map();
+      }
+      for (const chunk of f.getChunksInTimeRange(f.getMinTime(), f.getMaxTime())) {
+        for (const frame of chunk.frames) {
+          for (const [name, i] of indexes) {
+            const seen = out[name];
+            if (!seen.has(frame[i]) && seen.size < limit) {
+              seen.set(frame[i], frame[0 + f.getMainFieldIndexByName("time")]);
+            }
+          }
+        }
+      }
+      return Object.fromEntries(
+        Object.entries(out).map(([name, seen]) => [
+          name,
+          [...seen].map(([raw, time]) => ({
+            raw,
+            time,
+            shown: FlightLogFieldPresenter.decodeFieldToFriendly(f, name, raw),
+          })),
+        ]),
+      );
+    },
+
     setGraphs(config) {
       app.newGraphConfig(config, true);
       return api.state().graphs;
