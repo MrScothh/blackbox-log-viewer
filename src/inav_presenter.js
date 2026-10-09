@@ -67,6 +67,34 @@ function decodeInavUnits(flightLog, fieldName, value, settings) {
     case "rcData":
     case "servo":
       return `${value} us`;
+    // PID terms and navigation controller outputs are in mixer units (500 = 500 us of motor command), unitless
+    // as the INAV viewer always showed them
+    case "axisP":
+    case "axisI":
+    case "axisD":
+    case "axisF":
+    case "axisSum":
+    case "fwAltP":
+    case "fwAltI":
+    case "fwAltD":
+    case "fwAltOut":
+    case "fwPosP":
+    case "fwPosI":
+    case "fwPosD":
+    case "fwPosOut":
+    case "fwAutoSpeedP":
+    case "fwAutoSpeedI":
+    case "mcPosAxisP":
+    case "mcVelAxisP":
+    case "mcVelAxisI":
+    case "mcVelAxisD":
+    case "mcVelAxisFF":
+    case "mcVelAxisOut":
+    case "mcSurfaceP":
+    case "mcSurfaceI":
+    case "mcSurfaceD":
+    case "mcSurfaceOut":
+      return `${Math.round(value)}`;
     case "vbat":
     case "sagCompensatedVBat":
       return `${(value / 100).toFixed(2)} V`;
