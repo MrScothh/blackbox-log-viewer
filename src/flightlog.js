@@ -12,6 +12,7 @@ import {
   SUPER_EXPO_YAW,
   FIRMWARE_TYPE_BETAFLIGHT,
   FIRMWARE_TYPE_CLEANFLIGHT,
+  FIRMWARE_TYPE_INAV,
 } from "./flightlog_fielddefs";
 import { IMU } from "./imu";
 import { FIFOCache } from "./cache";
@@ -765,6 +766,14 @@ export function FlightLog(logData) {
         destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
       }
       destFrame[fieldIndex++] = srcFrame[setpoint[AXIS.YAW + 1]] / 10;
+    } else if (sysConfig.firmwareType === FIRMWARE_TYPE_INAV && setpoint) {
+      for (let axis = 0; axis <= AXIS.YAW; axis++) {
+        destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
+      }
+      destFrame[fieldIndex++] =
+        setpoint[AXIS.YAW + 1] !== undefined
+          ? this.rcCommandRawToThrottle(srcFrame[setpoint[AXIS.YAW + 1]])
+          : 0;
     } else {
       for (let axis = 0; axis <= AXIS.YAW; axis++) {
         destFrame[fieldIndex++] =
@@ -882,6 +891,10 @@ export function FlightLog(logData) {
     let imuQuaternion = [fieldNameToIndex["imuQuaternion[0]"], fieldNameToIndex["imuQuaternion[1]"], fieldNameToIndex["imuQuaternion[2]"]];
     let rcCommand = [fieldNameToIndex["rcCommand[0]"], fieldNameToIndex["rcCommand[1]"], fieldNameToIndex["rcCommand[2]"], fieldNameToIndex["rcCommand[3]"]];
     let setpoint = [fieldNameToIndex["setpoint[0]"], fieldNameToIndex["setpoint[1]"], fieldNameToIndex["setpoint[2]"], fieldNameToIndex["setpoint[3]"]];
+    // INAV logs the PID controller's rate target as axisRate (deg/s); the throttle stays rcCommand[3]
+    if (this.getSysConfig().firmwareType === FIRMWARE_TYPE_INAV && fieldNameToIndex["axisRate[0]"] !== undefined) {
+      setpoint = [fieldNameToIndex["axisRate[0]"], fieldNameToIndex["axisRate[1]"], fieldNameToIndex["axisRate[2]"], fieldNameToIndex["rcCommand[3]"]];
+    }
     let gpsCoord = [fieldNameToIndex["GPS_coord[0]"], fieldNameToIndex["GPS_coord[1]"], fieldNameToIndex["GPS_altitude"]];
     let gpsVelNED = [fieldNameToIndex["GPS_velned[0]"], fieldNameToIndex["GPS_velned[1]"], fieldNameToIndex["GPS_velned[2]"]];
     let axisPID = [
