@@ -636,6 +636,7 @@ export function FlightLogParser(logData) {
    * Check if firmware meets the 3.0.1/2.0.0 version threshold for filter fields
    */
   const isModernFilterFirmware = () =>
+    this.sysConfig.firmwareType === FIRMWARE_TYPE_INAV ||
     (this.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
       semver.gte(this.sysConfig.firmwareVersion, "3.0.1")) ||
     (this.sysConfig.firmwareType === FIRMWARE_TYPE_CLEANFLIGHT &&
@@ -899,12 +900,14 @@ export function FlightLogParser(logData) {
 
     const lineEnd = stream.pos;
 
-    const fieldName = translateFieldName(
-      asciiArrayToString(stream.data.subarray(lineStart, separatorPos)),
-    );
+    const rawName = asciiArrayToString(stream.data.subarray(lineStart, separatorPos));
+    const fieldName = translateFieldName(rawName);
     const fieldValue = asciiArrayToString(
       stream.data.subarray(separatorPos + 1, lineEnd),
     );
+    if (!rawName.startsWith("Field ")) {
+      this.sysConfig.headerLines.push({ name: rawName, value: fieldValue });
+    }
 
     const handler = HEADER_HANDLERS[fieldName];
     if (handler) {
@@ -916,7 +919,6 @@ export function FlightLogParser(logData) {
       } else {
         console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
       }
-      this.sysConfig.unknownHeaders ??= [];
       this.sysConfig.unknownHeaders.push({
         name: fieldName,
         value: fieldValue,
@@ -1751,6 +1753,9 @@ export function FlightLogParser(logData) {
       ...defaultSysConfigExtension,
     };
     this.sysConfig = Object.create(completeSysConfig); // Object.create(defaultSysConfig);
+    // own arrays: the defaults' ones are shared by every log and every parse
+    this.sysConfig.unknownHeaders = [];
+    this.sysConfig.headerLines = [];
 
     this.frameDefs = {};
 
