@@ -1,4 +1,6 @@
 import semver from "semver";
+import { inavTablesFor } from "./inav_header.js";
+import { INAV_RC_MODE_NAMES } from "./inav_defs.js";
 
 function makeReadOnly(x) {
   // Make read-only if browser supports it:
@@ -266,6 +268,8 @@ export const RC_SMOOTHING_DEBUG_AXIS = makeReadOnly([
 export const FILTER_TYPE = makeReadOnly(["PT1", "BIQUAD", "PT2", "PT3"]);
 
 export let DEBUG_MODE = [];
+// Set for INAV logs: INAV's debug modes share some names with Betaflight's but not their fields
+export let DEBUG_MODE_IS_INAV = false;
 
 export const DEBUG_MODE_COMPLETE = makeReadOnly([
   "NONE",
@@ -512,6 +516,18 @@ export const SIMPLIFIED_PIDS_MODE = makeReadOnly([
 export const THROTTLE_LIMIT_TYPE = makeReadOnly(["OFF", "SCALE", "CLIP"]);
 
 export function adjustFieldDefsList(firmwareType, firmwareVersion) {
+  DEBUG_MODE_IS_INAV = false;
+  if (firmwareType === FIRMWARE_TYPE_INAV) {
+    // INAV numbers these its own way and renumbered some between releases: tables of the log's release
+    const tables = inavTablesFor(firmwareVersion);
+    DEBUG_MODE_IS_INAV = true;
+    DEBUG_MODE = makeReadOnly(tables.debug_modes.slice(0));
+    ACC_HARDWARE = makeReadOnly(tables.acc_hardware.slice(0));
+    MAG_HARDWARE = makeReadOnly(tables.mag_hardware.slice(0));
+    // flightModeFlags holds INAV's RC modes (boxId bits 0-31)
+    FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(INAV_RC_MODE_NAMES.slice(0, 32).map((n) => n ?? ""));
+    return;
+  }
   if (
     firmwareType === FIRMWARE_TYPE_BETAFLIGHT &&
     semver.gte(firmwareVersion, "3.3.0")

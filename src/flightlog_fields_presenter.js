@@ -3,6 +3,7 @@ import {
   FLIGHT_LOG_FLIGHT_MODE_NAME,
   FLIGHT_LOG_FEATURES,
   DEBUG_MODE,
+  DEBUG_MODE_IS_INAV,
   FLIGHT_LOG_FLIGHT_STATE_NAME,
   FLIGHT_LOG_FAILSAFE_PHASE_NAME,
   FFT_CALC_STEPS,
@@ -2393,6 +2394,10 @@ FlightLogFieldPresenter.fieldNameToFriendly = function (fieldName, debugMode) {
     if (fieldName.includes("debug")) {
       const debugModeName = DEBUG_MODE[debugMode];
       let debugFields;
+
+      if (DEBUG_MODE_IS_INAV) {
+        return `${fieldName} (${debugModeName || debugMode})`;
+      }
 
       if (debugModeName) {
         debugFields = DEBUG_FRIENDLY_FIELD_NAMES[debugModeName];

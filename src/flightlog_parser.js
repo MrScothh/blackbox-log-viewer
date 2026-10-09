@@ -10,6 +10,7 @@ import {
   FIRMWARE_TYPE_INAV,
 } from "./flightlog_fielddefs";
 import { ArrayDataStream } from "./datastream";
+import { parseInavHeaderValue } from "./inav_header.js";
 import "./decoders";
 import {
   hexToFloat,
@@ -900,7 +901,12 @@ export function FlightLogParser(logData) {
     if (handler) {
       handler(fieldName, fieldValue);
     } else if (!parseFieldDefinition(fieldName, fieldValue)) {
-      console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
+      if (this.sysConfig.firmwareType === FIRMWARE_TYPE_INAV) {
+        // INAV-only settings: kept for the header view rather than dropped
+        this.sysConfig[fieldName] = parseInavHeaderValue(fieldValue);
+      } else {
+        console.log(`Ignoring unsupported header ${fieldName} ${fieldValue}`);
+      }
       this.sysConfig.unknownHeaders ??= [];
       this.sysConfig.unknownHeaders.push({
         name: fieldName,
