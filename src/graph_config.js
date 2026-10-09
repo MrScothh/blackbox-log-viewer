@@ -102,8 +102,10 @@ export function GraphConfig(graphConfig) {
     );
     if (field.curve === undefined || forceNewCurve) {
       field.curve = defaultCurve;
-    } else if (field.curve.MinMax === undefined) {
-      field.curve.MinMax = defaultCurve.MinMax;
+    } else {
+      // a field given by name only (example graphs) arrives with an empty curve
+      field.curve.power ??= defaultCurve.power;
+      field.curve.MinMax ??= defaultCurve.MinMax;
     }
 
     if (field.smoothing === undefined) {
@@ -250,7 +252,8 @@ GraphConfig.getDefaultCurveForField = function (flightLog, fieldName) {
     }
 
     if (min !== Number.MAX_VALUE && max !== -Number.MAX_VALUE) {
-      return { min: min, max: max };
+      // a field constant over the whole log still needs a range to be drawn
+      return min === max ? { min: min - 1, max: max + 1 } : { min: min, max: max };
     }
 
     return { min: -500, max: 500 };
