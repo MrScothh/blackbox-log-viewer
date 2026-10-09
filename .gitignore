@@ -11,6 +11,8 @@ apps/
 dist/
 debug/
 release/
+# electron-forge packages (npm run desktop:package, desktop:make)
+out/
 
 # artefacts for Visual Studio Code
 /.vscode/

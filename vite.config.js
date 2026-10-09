@@ -38,7 +38,7 @@ function debugFiles() {
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   build: {
     sourcemap: true,
   },
@@ -118,6 +118,8 @@ export default defineConfig({
       },
     }),
     VitePWA({
+      // the desktop app (electron/, vite build --mode desktop) is installed already and serves its own files
+      disable: mode === "desktop",
       registerType: "autoUpdate",
       devOptions: { enabled: false },
       workbox: {
@@ -169,4 +171,4 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
   },
-});
+}));

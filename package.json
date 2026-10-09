@@ -5,21 +5,24 @@
   "description": "Crossplatform blackbox analytics tool for the INAV flight control system.",
   "version": "2026.6.0",
   "type": "module",
-  "main": "index.html",
+  "main": "electron/main.js",
   "default_locale": "en",
   "scripts": {
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
+    "desktop": "vite build --mode desktop && electron .",
+    "desktop:package": "vite build --mode desktop && electron-forge package",
+    "desktop:make": "vite build --mode desktop && electron-forge make",
+    "lint": "eslint src electron forge.config.js",
+    "lint:fix": "eslint src electron forge.config.js --fix",
     "format": "prettier --write src"
   },
   "repository": {
     "type": "git",
     "url": "github.com/betaflight/blackbox-log-viewer"
   },
-  "author": "The Betaflight open source project.",
+  "author": "The INAV open source project",
   "license": "GPL-3.0",
   "dependencies": {
     "html2canvas": "^1.0.0-rc.5",
@@ -35,10 +38,16 @@
     "webm-writer": "^1.0.0"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.8.3",
+    "@electron-forge/maker-deb": "^7.8.3",
+    "@electron-forge/maker-dmg": "^7.8.3",
+    "@electron-forge/maker-rpm": "^7.8.3",
+    "@electron-forge/maker-zip": "^7.8.3",
     "@eslint/js": "^10.0.1",
     "@iconify-json/lucide": "^1.2.105",
     "@nuxt/ui": "^4.8.1",
     "@vitejs/plugin-vue": "^6.0.6",
+    "electron": "^38.8.6",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.6.0",

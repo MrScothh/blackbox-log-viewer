@@ -48,4 +48,21 @@ export default [
       semi: ["error", "always"],
     },
   },
+  // desktop app: Node code (electron/main.js, forge.config.js) and a CommonJS preload
+  {
+    files: ["electron/**/*.js", "forge.config.js"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: { ...globals.node },
+    },
+  },
+  {
+    files: ["electron/**/*.cjs"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "commonjs",
+      globals: { ...globals.node },
+    },
+  },
 ];

@@ -547,6 +547,9 @@ function BlackboxLogViewer() {
       });
     }
 
+    // desktop app (electron/preload.cjs): logs opened from the system
+    globalThis.inavDesktop?.onOpenFile((name, bytes) => loadFiles([new File([bytes], name)]));
+
     prefs.get("videoConfig", function (item) {
       if (item) {
         playbackStore.videoConfig = item;
