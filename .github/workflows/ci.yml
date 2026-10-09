@@ -1,0 +1,147 @@
+name: Build Blackbox Explorer
+# Don't enable CI on push, just on PR. If you are working on the main repo and want to trigger a CI build, submit a
+# draft PR. nightly-build.yml calls this workflow on every push to master.
+on:
+  pull_request:
+
+  workflow_call:
+
+jobs:
+  build-web:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup environment
+        run: |
+          # the PR's own commit when triggered by a PR, the pushed one otherwise
+          COMMIT_ID=${{ github.event.pull_request.head.sha }}
+          COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
+          VERSION=$(node -p "require('./package.json').version")
+          echo "BUILD_NAME=inav-blackbox-explorer_web_${VERSION}_ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})" >> $GITHUB_ENV
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - name: Build the web app
+        run: npm run build
+      - name: Upload the web app
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_NAME }}
+          path: ./dist/
+          if-no-files-found: error
+
+  build-linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup environment
+        run: |
+          COMMIT_ID=${{ github.event.pull_request.head.sha }}
+          COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
+          VERSION=$(node -p "require('./package.json').version")
+          echo "BUILD_NAME=inav-blackbox-explorer_linux_x64_${VERSION}_ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})" >> $GITHUB_ENV
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install packaging tools
+        run: sudo apt-get update && sudo apt-get -y install dpkg fakeroot rpm
+      - run: npm ci
+      - name: Build Linux
+        run: |
+          npx vite build --mode desktop
+          npx electron-forge make --platform=linux --arch=x64
+      - name: Upload Linux deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_NAME }}_DEB
+          path: ./out/make/deb/x64/*.deb
+          if-no-files-found: error
+      - name: Upload Linux rpm
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_NAME }}_RPM
+          path: ./out/make/rpm/x64/*.rpm
+          if-no-files-found: error
+      - name: Upload Linux zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_NAME }}_ZIP
+          path: ./out/make/zip/linux/x64/*.zip
+          if-no-files-found: error
+
+  build-mac:
+    strategy:
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup environment
+        run: |
+          COMMIT_ID=${{ github.event.pull_request.head.sha }}
+          COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
+          VERSION=$(node -p "require('./package.json').version")
+          echo "BUILD_NAME=inav-blackbox-explorer_MacOS_${{ matrix.arch }}_${VERSION}_ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})" >> $GITHUB_ENV
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Build MacOS
+        run: |
+          npx vite build --mode desktop
+          npx electron-forge make --platform=darwin --arch=${{ matrix.arch }}
+      - name: Upload MacOS zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_NAME }}_ZIP
+          path: ./out/make/zip/darwin/${{ matrix.arch }}/*.zip
+          if-no-files-found: error
+      - name: Upload MacOS dmg
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_NAME }}_DMG
+          path: ./out/make/*.dmg
+          if-no-files-found: error
+
+  build-windows:
+    strategy:
+      matrix:
+        include:
+          - arch: x64
+            platform: win64
+          - arch: ia32
+            platform: win32
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup environment
+        shell: bash
+        run: |
+          COMMIT_ID=${{ github.event.pull_request.head.sha }}
+          COMMIT_ID=${COMMIT_ID:-${{ github.sha }}}
+          VERSION=$(node -p "require('./package.json').version")
+          echo "BUILD_NAME=inav-blackbox-explorer_${{ matrix.platform }}_${{ matrix.arch }}_${VERSION}_ci-$(date '+%Y%m%d')-$(git rev-parse --short ${COMMIT_ID})" >> $GITHUB_ENV
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Build Windows
+        run: |
+          npx vite build --mode desktop
+          npx electron-forge make --platform=win32 --arch=${{ matrix.arch }}
+      - name: Upload Windows zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_NAME }}_ZIP
+          path: ./out/make/zip/win32/${{ matrix.arch }}/*.zip
+          if-no-files-found: error

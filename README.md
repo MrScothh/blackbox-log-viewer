@@ -1,170 +1,184 @@
-# Betaflight Blackbox Explorer
+# INAV Blackbox Explorer
 
-[![Latest version](https://img.shields.io/github/v/release/betaflight/blackbox-log-viewer)](https://github.com/betaflight/blackbox-log-viewer/releases)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=betaflight_blackbox-log-viewer&metric=alert_status)](https://sonarcloud.io/dashboard?id=betaflight_blackbox-log-viewer)
-[![Build](https://img.shields.io/github/actions/workflow/status/betaflight/blackbox-log-viewer/deploy.yml?branch=master)](https://github.com/betaflight/blackbox-log-viewer/actions/workflows/deploy.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Join us on Discord!](https://img.shields.io/discord/868013470023548938)](https://discord.gg/n4E6ak4u3c)
-
-
-> [!IMPORTANT]
-> **This project has moved into the Betaflight App and is now feature frozen.**
->
-> Blackbox Explorer is built into the Betaflight App as the **Blackbox Viewer**
-> tab, available at [app.betaflight.com](https://app.betaflight.com) and in the
-> desktop and mobile builds. It has shipped there since the 2026.6 release.
->
-> - **No further development happens in this repository.** Please raise bugs and
->   feature requests against
->   [betaflight-configurator](https://github.com/betaflight/betaflight-configurator/issues).
-> - **This repository will be archived on 1 December 2026**, after which it
->   becomes read-only.
-> - [blackbox.betaflight.com](https://blackbox.betaflight.com) stays online as a
->   frozen, unmaintained build of the last standalone release. It will not
->   receive fixes or new features.
->
-> Everything below describes the standalone viewer and is kept for reference.
 
 ![Main explorer interface](screenshots/main-interface.jpg)
 
-This tool allows you to open logs recorded by Betaflight's Blackbox feature in
-your web browser. You can seek through the log to examine graphed values at each
-timestep. If you have a flight video, you can load that in as well and it'll be
-played behind the log. You can export the graphs as a WebM video to share with
-others.
+This tool opens the logs recorded by INAV's blackbox, on an SD card or in the flight controller's flash. You can seek
+through a log and read every logged value at each moment, as graphs, as numbers, as a picture of the craft and its
+sticks, on a map, or as a frequency spectrum. If you have a flight video, it plays behind the graphs, and the graphs
+can be exported as a video of their own.
+
+It reads INAV's own fields with their names and units: modes, navigation states and failsafe phases with the
+firmware's names, positions in metres, rates in degrees per second, the multirotor and fixed wing navigation
+controllers, the log header in INAV's terms. Names and lookup tables follow the INAV release that wrote the log, from
+INAV 7 on. Older INAV logs, and Betaflight and Cleanflight logs, still open.
 
 ## Installation
 
-Current blackbox explorer version is built as
-[PWA](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/What_is_a_progressive_web_app).
-Meaning it can work in both online and offline modes as regular desktop app
-would.
+The explorer comes as a desktop application and as a web application; both are the same program.
 
-### Latest stable version
+### Desktop application
 
-The maintained version is the **Blackbox Viewer** tab in the Betaflight App at
-https://app.betaflight.com/
+1. Visit the [release page](https://github.com/iNavFlight/blackbox-log-viewer/releases).
+1. Download the file for your system: a zip for Windows, a dmg or zip for MacOS, a deb, rpm or zip for Linux.
+1. Install or unpack it, and run **INAV Blackbox Explorer**.
+1. The application is not signed, so your system may ask you to confirm that you want to run it. On MacOS, run
+   `xattr -cr "/path/to/INAV Blackbox Explorer.app"` if it reports the application as damaged.
 
-The final standalone release remains available, frozen and unmaintained, at
-https://blackbox.betaflight.com/
+Development builds of the latest code are published as pre-releases in
+[blackbox-log-viewer-nightly](https://github.com/iNavFlight/blackbox-log-viewer-nightly/releases). They are meant for
+testing and may be broken.
 
-### Unstable testing versions
+### Web application
 
-The latest master build of the Betaflight App, including the Blackbox Viewer
-tab, is always available at https://master.app.betaflight.com/
-
-The standalone master build at https://master.blackbox.betaflight.com/ is no
-longer updated.
-
-**Be aware that these versions are intended for testing / feedback only, and may be buggy or broken. Caution is advised when using these versions.**
-
-### Install the app to be used in offline mode
-
-Follow the procedure to install PWA on your platform. For example on MacOS chrome:
-![Url bar PWA install](screenshots/url-bar.webp)
-![PWA install dialog](screenshots/pwa-install-dialog.webp)
+The same program runs in a browser, and a Chromium-based browser (Chrome, Edge) can install it as an application that
+works offline afterwards: open the page, then use the install button in the address bar. The nightly releases include
+it as a `_web_` zip, to be served over HTTPS or from `localhost`.
 
 ## Usage
 
-Click the "Open log file/video" button at the top right and select your log file
-and your flight video (if you recorded one).
+Click **Open log file/video** at the top right and choose the log, a `.TXT` file from an SD card or the file
+downloaded from the flight controller's flash by INAV Configurator, and your flight video if you recorded one. On the
+desktop you can also open a log with the application from your file manager. A file that holds several flights opens
+on the first, and a selector in the legend switches to the others.
 
-You can scroll through the log by clicking or dragging on the seek bar that
-appears underneath the main graph. The current time is represented by the
-vertical red bar in the center of the graph. You can also click and drag left
-and right on the graph area to scrub backwards and forwards.
+Scroll through the log by clicking or dragging on the seek bar under the graphs. The current time is the vertical red
+bar in the centre of the graph; click and drag left and right on the graph to scrub backwards and forwards. The
+keyboard icon at the top right lists the keyboard shortcuts.
+
+### Graphs and workspaces
+
+**Graph Setup**, under the legend, chooses which fields are plotted. **Add graph** offers ready-made graphs for INAV:
+motors and servos, gyro and setpoint, the PID terms of each axis, attitude, battery, altitude and speeds with their
+navigation targets, the navigation controllers, airspeed, wind, GPS and more. A plane opens on its servos and gyros, a
+multirotor on its motors and gyros.
+
+A workspace is a set of graphs kept in one of ten slots, switched with the keys **1** to **0** (**Shift** with the key
+saves the current graphs there). The **Workspaces** menu
+fills them with presets for multirotors (roll, pitch and yaw tuning, gyro filtering, altitude and position hold,
+battery, GPS) or for planes (roll, pitch and yaw tuning on the servos, attitude, altitude, navigation, airspeed and wind,
+battery), and saves your own.
+
+### Log header
+
+The **i** button shows the settings the flight controller wrote at the start of the log, in INAV's terms: PIDs with the
+navigation controllers, rates, filters, motor protocol, battery, sensors and features. **All Headers** lists every
+header line as the log has it.
+
+![Log header](screenshots/log-header.jpg)
+
+### Craft, sticks, map and spectrum
+
+The craft view shows a multirotor's motors, or for a plane an artificial horizon from INAV's attitude, a throttle bar per
+motor and the travel of each servo. The sticks view shows the RC commands, the map the GPS track, and the spectrum
+analyser the frequency content of the selected field, with the gyro and D-term filter cutoffs from the log's header.
 
 ### Syncing your log to your flight video
 
-The blackbox plays a short beep on the buzzer when arming, and this corresponds
-with the start of the logged data.  You can sync your log against your flight
-video by pressing the "start log here" button when you hear the beep in the
-video. You can tune the alignment of the log manually by pressing the nudge left
-and nudge right buttons in the log sync section, or by editing the value in the
-"log sync" box. Positive values move the log toward the end of the video,
+The blackbox plays a short beep on the buzzer when arming, and this corresponds with the start of the logged data. You
+can sync your log against your flight video by pressing the "start log here" button when you hear the beep in the
+video. You can tune the alignment of the log manually by pressing the nudge left and nudge right buttons in the log sync
+section, or by editing the value in the "log sync" box. Positive values move the log toward the end of the video,
 negative values move it towards the beginning.
 
-### Customizing the graph display
+### Exporting
 
-Click the "Graph Setup" button on the right side of the display in order to
-choose which fields should be plotted on the graph. You may, for example, want
-to remove the default gyro plot and add separate gyro plots for each rotation
-axis.  Or you may want to plot vbat against throttle to examine your battery's
-performance.
-
-## Developing
-
-### Node setup
-
-We are using [nvm](https://github.com/nvm-sh/nvm) to manage the correct node
-vesion, follow the install instructions there. After which from blackbox directory
-just run:
-
-```bash
-nvm use
-```
-
-### npm
-
-For dependency management we use [npm](https://www.npmjs.com/), which comes
-bundled with Node.js.
-
-### Development mode
-
-We are using [vite](https://vitejs.dev/) for development setup. It provides
-bundling and various optimisations like hot module reloading.
-
-With `node` setup, first install dependencies, then start developing:
-
-```bash
-npm install
-npm start
-```
-
-This will start development server and the Blackbox will be available on http://localhost:5173/.
-
-### Installing development build locally
-
-If you want to have latest and greatest version installed on your machine from
-the tip of the repository:
-
-First need to build the application:
-```bash
-npm run build
-```
-Then start the application in `preview` mode
-```bash
-npm run preview
-```
-Visit http://localhost:4173/ and follow the steps from [Install the app to be used in offline mode](#install-the-app-to-be-used-in-offline-mode)
+The toolbar exports the log as CSV, the GPS track as GPX, and the graphs as a WebM video, over the flight video if one
+is loaded.
 
 ## Common problems
 
 ### Flight video won't load, or jumpy flight video upon export
 
-Some flight video formats aren't supported by Chrome, so the viewer can't open
-them. You can fix this by re-encoding your video using the free tool
-[Handbrake][]. Open your original video using Handbrake. In the output settings,
-choose MP4 as the format, and H.264 as the video codec.
+Some flight video formats aren't supported by Chromium, so the explorer can't open them. You can fix this by
+re-encoding your video using the free tool [Handbrake][]. Open your original video using Handbrake. In the output
+settings, choose MP4 as the format, and H.264 as the video codec.
 
-Because of [Google Bug #66631][], Chrome is unable to accurately seek within
-H.264 videos that use B-frames. This is mostly fine when viewing the flight
-video inside Blackbox Explorer. However, if you use the "export video" feature,
-this bug will cause the flight video in the background of the exported video to
-occasionally jump backwards in time for a couple of frames, causing a very
-glitchy appearance.
+Because of [Chromium bug #66631][], H.264 videos that use B-frames cannot be seeked accurately. This is mostly fine when
+viewing the flight video inside the explorer. However, if you use the "export video" feature, this bug will cause the
+flight video in the background of the exported video to occasionally jump backwards in time for a couple of frames,
+causing a very glitchy appearance.
 
-To fix that issue, you need to tell Handbrake to render every frame as an
-intraframe, which will avoid any problematic B-frames. Do that by adding
-"keyint=1" into the Additional Options box:
+To fix that issue, you need to tell Handbrake to render every frame as an intraframe, which will avoid any problematic
+B-frames. Do that by adding "keyint=1" into the Additional Options box:
 
 ![Handbrake settings](screenshots/handbrake.png)
 
-Hit start to begin re-encoding your video. Once it finishes, you should be able
-to load the new video into the Blackbox Explorer.
+Hit start to begin re-encoding your video. Once it finishes, you should be able to load the new video into the
+explorer.
 
 [Handbrake]: https://handbrake.fr/
-[Google Bug #66631]: http://code.google.com/p/chromium/issues/detail?id=66631
+[Chromium bug #66631]: http://code.google.com/p/chromium/issues/detail?id=66631
+
+### A field shows the wrong name or unit, or a log does not open
+
+Open an issue with the log attached: most of these can only be found with the log that shows them.
+
+## Developing
+
+The explorer is built with [Vite](https://vitejs.dev/), Vue 3, Pinia and Nuxt UI; the desktop application is the same
+build in [Electron](https://www.electronjs.org/), packaged with electron-forge as INAV Configurator is.
+
+### Setup
+
+Node.js 22 (see `.nvmrc`; with [nvm](https://github.com/nvm-sh/nvm), run `nvm use`), then:
+
+```bash
+npm install
+npm start               # development server with hot reload, http://localhost:5173/
+```
+
+### Building
+
+```bash
+npm run build           # the web application, in dist/
+npm run preview         # serve that build, http://localhost:4173/, from where it can be installed
+npm run desktop         # build for the desktop and run it in Electron
+npm run desktop:make    # desktop packages for this system, in out/make/
+npm run lint            # what the CI checks
+```
+
+`.github/workflows/ci.yml` builds the web application and the desktop packages for Linux, MacOS and Windows on every
+pull request; `nightly-build.yml` publishes them from `master` to the nightly repository.
+
+### Where INAV lives in the code
+
+The explorer started as [Betaflight Blackbox Explorer](https://github.com/betaflight/blackbox-log-viewer). What is
+INAV's is kept in its own modules, so that the rest stays close to that code:
+
+| file | what it holds |
+|---|---|
+| `src/inav_defs.js` | INAV's names for modes, states, navigation, failsafe, sensors, and the per-release lookup tables. Generated: do not edit |
+| `tools/inav-defs.mjs` | the generator: `node tools/inav-defs.mjs PATH_TO_INAV_REPO [GIT_REV]` reads them from the firmware's sources |
+| `src/inav_header.js` | INAV header lines, the tables for a log's release, the filter values the spectrum analyser needs |
+| `src/inav_header_view.js` | the log header dialog for INAV logs |
+| `src/inav_presenter.js` | INAV's units and flag names in the legend and the tables |
+| `src/inav_field_names.js` | friendly names of INAV's fields |
+| `src/inav_graphs.js` | the example graphs and the defaults for planes and multirotors |
+| `src/inav_workspaces.js` | the workspace presets |
+| `src/craft_wing.js` | the craft view for planes |
+| `electron/` | the desktop application's main process and preload |
+
+When INAV adds a mode, a navigation state or a setting table, regenerate `src/inav_defs.js` from the release's tag.
+
+### Driving the explorer from a script
+
+A development build, or any build opened with `?debug` in the address, exposes `window.inavDebug`, which loads logs and
+reads values without the interface, for checks run through a browser's remote debugging:
+
+```js
+await inavDebug.loadUrl("/path/to/LOG00001.TXT")   // in development, /__debug/file?path=... serves local files
+inavDebug.seek(0.5)                                // a time in microseconds, or a fraction of the log
+inavDebug.values(["navPos[2]", "attitude[0]"])     // raw and displayed values now
+inavDebug.header()                                 // the parsed header
+inavDebug.theme("dark")                            // "dark", "light" or "auto"
+```
+
+## Credits
+
+INAV Blackbox Explorer is based on Betaflight Blackbox Explorer, by the Betaflight project, which in turn descends from
+Nicholas Sherlock's Blackbox for Cleanflight. Open Sans and the INAV logo and icons come from INAV Configurator.
 
 ## License
 
