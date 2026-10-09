@@ -32,6 +32,7 @@ import { useWorkspaceStore } from "./stores/workspace.js";
 import { useAppStore } from "./stores/app.js";
 import { useSettingsStore } from "./stores/settings.js";
 import { watch } from "vue";
+import { installDebugApi } from "./debug_api.js";
 
 
 function createNewBlackboxWindow(_fileToOpen) {
@@ -701,3 +702,4 @@ function BlackboxLogViewer() {
 }
 
 new BlackboxLogViewer(); // NOSONAR — constructor registers callbacks on Pinia stores
+installDebugApi();

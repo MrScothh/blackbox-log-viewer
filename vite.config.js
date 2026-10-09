@@ -4,12 +4,42 @@ import vue from "@vitejs/plugin-vue";
 import ui from "@nuxt/ui/vite";
 import { VitePWA } from "vite-plugin-pwa";
 import pkg from "./package.json";
+import fs from "node:fs";
+import path from "node:path";
+
+// Dev server only: GET /__debug/file?path=... hands a local log to window.inavDebug.loadUrl(), for files inside
+// DEBUG_LOG_ROOT (default: this folder)
+function debugFiles() {
+  return {
+    name: "inav-debug-files",
+    apply: "serve",
+    configureServer(server) {
+      const root = path.resolve(process.env.DEBUG_LOG_ROOT || process.cwd()).toLowerCase();
+      server.middlewares.use("/__debug/file", (req, res) => {
+        const file = path.resolve(new URL(req.url, "http://localhost").searchParams.get("path") || "");
+        if (!file.toLowerCase().startsWith(root + path.sep)) {
+          res.statusCode = 403;
+          res.end("outside DEBUG_LOG_ROOT");
+          return;
+        }
+        fs.createReadStream(file)
+          .on("error", () => {
+            res.statusCode = 404;
+            res.end();
+          })
+          .pipe(res);
+      });
+    },
+  };
+}
+
 
 export default defineConfig({
   build: {
     sourcemap: true,
   },
   plugins: [
+    debugFiles(),
     vue(),
     ui({
       colorMode: false,
