@@ -24,6 +24,8 @@ import {
 
 export function FlightLogParser(logData) {
   //Private constants:
+  // An INAV field list runs past 1024 characters with 12 motors or many servos
+  const MAX_HEADER_LINE_LENGTH = 8192;
   const FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
     //Assume that even in the most woeful logging situation, we won't miss 10 seconds of frames
     MAXIMUM_TIME_JUMP_BETWEEN_FRAMES = 10 * 1000000,
@@ -879,7 +881,7 @@ export function FlightLogParser(logData) {
 
     for (
       ;
-      stream.pos < lineStart + 1024 && stream.pos < stream.end;
+      stream.pos < lineStart + MAX_HEADER_LINE_LENGTH && stream.pos < stream.end;
       stream.pos++
     ) {
       if (separatorPos === false && stream.data[stream.pos] === COLON) {
