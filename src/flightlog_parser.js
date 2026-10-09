@@ -471,6 +471,13 @@ export function FlightLogParser(logData) {
   let lastSkippedFrames;
   // Details about the last main frame that was successfully parsed
   let lastMainFrameIteration, lastMainFrameTime;
+  // INAV logs from before inav#12126 leave out the ninth value of a 9-field TAG8_8SVB run when it is zero
+  let inavNinthFieldMayBeAbsent = false;
+  // Frames where only one reading ended on a marker, by reading: the tie breaker of last resort
+  let inavNinthFieldPresentCount = 0,
+    inavNinthFieldAbsentCount = 0;
+  // Neither reading could be told apart: the frame is dropped rather than decoded shifted
+  let inavNinthFieldUnsure = false;
 
   //Public fields:
 
@@ -1039,6 +1046,7 @@ export function FlightLogParser(logData) {
     previous2,
     skippedFrames,
     raw,
+    ninthFieldAbsent = false,
   ) {
     const predictor = frameDef.predictor,
       encoding = frameDef.encoding,
@@ -1122,7 +1130,17 @@ export function FlightLogParser(logData) {
 
             groupCount = j - i;
 
-            stream.readTag8_8SVB(values, groupCount);
+            // A lone field after a run of 8 is the ninth, which INAV before inav#12126 wrote only when non-zero
+            if (
+              ninthFieldAbsent &&
+              groupCount === 1 &&
+              i > 0 &&
+              encoding[i - 1] === FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB
+            ) {
+              values[0] = 0;
+            } else {
+              stream.readTag8_8SVB(values, groupCount);
+            }
 
             for (j = 0; j < groupCount; j++, i++)
               current[i] = applyPrediction(
@@ -1217,6 +1235,10 @@ export function FlightLogParser(logData) {
   };
 
   const completeInterframe = (frameType, frameStart, frameEnd, raw) => {
+    if (inavNinthFieldUnsure) {
+      inavNinthFieldUnsure = false;
+      mainStreamIsValid = false;
+    }
     // Reject this frame if the time or iteration count jumped too far
     if (
       mainStreamIsValid &&
@@ -1429,7 +1451,115 @@ export function FlightLogParser(logData) {
       previous2,
       lastSkippedFrames,
       raw,
+      inavNinthFieldMayBeAbsent && inavNinthFieldLooksAbsent(),
     );
+  };
+
+  // Is there a run of exactly `length` consecutive TAG8_8SVB fields in the frame definition?
+  function hasTag8_8SVBRun(frameDef, length) {
+    let run = 0;
+    for (let i = 0; i < (frameDef?.count ?? 0); i++) {
+      if (frameDef.encoding[i] === FLIGHT_LOG_FIELD_ENCODING_TAG8_8SVB) {
+        run++;
+      } else {
+        if (run === length) {
+          return true;
+        }
+        run = 0;
+      }
+    }
+    return run === length;
+  }
+
+  // Parse the frame whose marker is at frameStart without predictions and report whether it ends where another
+  // frame or the log ends; the stream is left where it was
+  const frameEndsOnMarker = (frameStart, ninthFieldAbsent) => {
+    const marker = String.fromCodePoint(stream.data[frameStart]);
+    if (!getFrameType(marker)) {
+      return { ends: false, end: frameStart };
+    }
+    // Parsing an event frame would replace the last event: check only that an event type INAV writes follows
+    if (marker === "E") {
+      const eventType = frameStart + 1 < stream.end ? stream.data[frameStart + 1] : -1;
+      return { ends: [0, 10, 11, 12, 13, 14, 20, 30, 40, 255].includes(eventType), end: frameStart };
+    }
+    const frameDef = this.frameDefs[marker];
+    if (!frameDef) {
+      return { ends: false, end: frameStart };
+    }
+    const pos = stream.pos,
+      eof = stream.eof;
+    stream.pos = frameStart + 1;
+    stream.eof = false;
+    parseFrame(frameDef, new Array(frameDef.count + 8), null, null, 0, true, marker === "P" && ninthFieldAbsent);
+    const end = stream.pos;
+    const ends =
+      !stream.eof &&
+      end - frameStart <= FLIGHT_LOG_MAX_FRAME_LENGTH &&
+      (end >= stream.end || !!getFrameType(String.fromCodePoint(stream.data[end])));
+    stream.pos = pos;
+    stream.eof = eof;
+    return { ends, end };
+  };
+
+  // How many frames in a row, from frameStart, end where another frame or the log begins, up to max. A P frame
+  // passes with either reading of the ninth value; an event frame ends the walk, as it is not measured
+  const framesEndingOnMarkers = (frameStart, max) => {
+    let count = 0;
+    while (count < max) {
+      if (frameStart >= stream.end) {
+        return max;
+      }
+      let result = frameEndsOnMarker(frameStart, false);
+      if (!result.ends && stream.data[frameStart] === 0x50) {
+        result = frameEndsOnMarker(frameStart, true);
+      }
+      if (!result.ends) {
+        break;
+      }
+      count++;
+      if (stream.data[frameStart] === 0x45) {
+        break;
+      }
+      frameStart = result.end;
+    }
+    return count;
+  };
+
+  // Read the P frame whose body starts at the stream position with the ninth value present or absent: keep the
+  // reading that ends on the next frame's marker. When both do, the wrong one ends a value early or late on a byte
+  // that only looks like a marker: keep the one after which more frames in a row end on markers, and if that is
+  // level too, the reading this log has needed more often (same rules as blackbox-tools)
+  const inavNinthFieldLooksAbsent = () => {
+    const frameStart = stream.pos - 1;
+    inavNinthFieldUnsure = false;
+    const present = frameEndsOnMarker(frameStart, false);
+    const absent = frameEndsOnMarker(frameStart, true);
+
+    if (present.ends && absent.ends && present.end !== absent.end) {
+      const chainPresent = framesEndingOnMarkers(present.end, 8);
+      const chainAbsent = framesEndingOnMarkers(absent.end, 8);
+      if (chainPresent !== chainAbsent) {
+        return chainAbsent > chainPresent;
+      }
+      if (inavNinthFieldAbsentCount >= 4 * inavNinthFieldPresentCount + 4) {
+        return true;
+      }
+      if (inavNinthFieldPresentCount >= 4 * inavNinthFieldAbsentCount + 4) {
+        return false;
+      }
+      inavNinthFieldUnsure = true;
+      return true;
+    }
+
+    if (present.ends !== absent.ends) {
+      if (absent.ends) {
+        inavNinthFieldAbsentCount++;
+      } else {
+        inavNinthFieldPresentCount++;
+      }
+    }
+    return absent.ends || !present.ends;
   };
 
   const parseGPSFrame = (raw) => {
@@ -1764,6 +1894,12 @@ export function FlightLogParser(logData) {
       lastFrameType = null;
 
     invalidateMainStream();
+
+    inavNinthFieldMayBeAbsent =
+      this.sysConfig.firmwareType === FIRMWARE_TYPE_INAV && hasTag8_8SVBRun(this.frameDefs.P, 9);
+    inavNinthFieldPresentCount = 0;
+    inavNinthFieldAbsentCount = 0;
+    inavNinthFieldUnsure = false;
 
     //Set parsing ranges up for the log the caller selected
     stream.start = startOffset === undefined ? stream.pos : startOffset;
