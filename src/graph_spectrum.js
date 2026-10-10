@@ -19,7 +19,9 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
   const ANALYSER_LARGE_LEFT_MARGIN = 10,
     ANALYSER_LARGE_TOP_MARGIN = 10,
     ANALYSER_LARGE_HEIGHT_MARGIN = 20,
-    ANALYSER_LARGE_WIDTH_MARGIN = 20;
+    ANALYSER_LARGE_WIDTH_MARGIN = 20,
+    // Strip above the plot for the hover toolbar, so it never covers labels or data
+    ANALYSER_TOOLBAR_HEIGHT = 28;
 
   const that = this,
     prefs = new PrefStorage(),
@@ -106,17 +108,19 @@ export function FlightLogAnalyser(flightLog, canvas, analyserCanvas) {
 
     this.resize = function () {
       const newSize = getSize();
-      GraphSpectrumPlot.setSize(newSize.width, newSize.height);
+      const plotHeight = Math.max(newSize.height - ANALYSER_TOOLBAR_HEIGHT, 0);
+      GraphSpectrumPlot.setSize(newSize.width, plotHeight);
 
-      // Position the analyser canvas container
+      // Position the analyser canvas container, under the toolbar strip
       const parentElem = analyserCanvas.parentElement;
       parentElem.style.left = `${newSize.left}px`;
-      parentElem.style.top = `${newSize.top}px`;
+      parentElem.style.top = `${newSize.top + ANALYSER_TOOLBAR_HEIGHT}px`;
 
       // Push layout to store for Vue component positioning
       graphStore.analyserLayout = {
         width: newSize.width,
-        height: newSize.height,
+        height: plotHeight,
+        toolbarHeight: ANALYSER_TOOLBAR_HEIGHT,
         left: newSize.left,
         top: newSize.top,
       };

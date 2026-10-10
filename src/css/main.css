@@ -229,72 +229,51 @@ html.has-sticks #stickCanvas {
     brightness(64%) contrast(130%);
 }
 
-.analyser:hover .non-shift .spectrum-buttons {
-  opacity: 1;
-  height: auto;
-  transition: opacity 500ms ease-in;
-}
-
-.analyser .spectrum-actions {
-  height: 0;
-  overflow: hidden;
-  opacity: 0;
-  top: 0;
-  left: 340px;
+/* Transparent but hit by the pointer: entering the strip from any side shows the toolbar */
+.analyser #spectrumToolbar {
+  left: 0;
   z-index: 9;
   position: absolute;
+  opacity: 0;
 }
 
-.analyser:hover .non-shift .spectrum-actions {
+/* Also while one of its menus is open, whose list lies outside the analyser */
+.analyser:hover #spectrumToolbar.non-shift,
+.analyser #spectrumToolbar.non-shift:has([aria-expanded="true"]) {
   opacity: 1;
-  height: auto;
   transition: opacity 500ms ease-in;
+}
+
+html:not(.has-analyser) .analyser #spectrumToolbar,
+.analyser #spectrumToolbar:not(.non-shift) {
+  visibility: hidden;
 }
 
 .analyser .spectrum-buttons {
-  height: 0;
-  overflow: hidden;
-  opacity: 0;
-  top: 0;
-  z-index: 9;
+  top: 2px;
   position: absolute;
   display: flex;
   gap: 4px;
   align-items: center;
 }
 
-.analyser:hover .non-shift #spectrumType {
-  opacity: 1;
-  height: auto;
-  transition: opacity 500ms ease-in;
+.analyser .spectrum-controls {
+  top: 2px;
+  left: 5px;
+  position: absolute;
+  display: flex;
+  gap: 6px;
+  align-items: center;
 }
 
 .analyser #spectrumType {
-  height: 0;
-  overflow: hidden;
-  opacity: 0;
-  left: 5px;
-  float: left;
-  z-index: 9;
-  position: absolute;
-  min-width: 150px;
-}
-
-.analyser:hover .non-shift #overdrawSpectrumType {
-  opacity: 1;
-  height: auto;
-  transition: opacity 500ms ease-in;
+  flex: 0 1 170px;
+  min-width: 0;
 }
 
 .analyser #overdrawSpectrumType {
-  height: 0;
-  overflow: hidden;
-  opacity: 0;
-  left: 170px;
-  float: left;
-  z-index: 9;
-  position: absolute;
-  min-width: 160px;
+  flex: 0 1 176px;
+  min-width: 0;
 }
 
 .analyser .analyser-slider-x {
