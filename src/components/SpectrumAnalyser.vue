@@ -2,32 +2,34 @@
   <div id="analyser" class="analyser">
     <canvas width="0" height="0" id="analyserCanvas"></canvas>
 
-    <span id="spectrumToolbar" :class="{ 'non-shift': !graphStore.spectrumShiftActive }">
-      <div id="spectrumType" title="Type of Spectrum">
-        <USelect
-          v-model="spectrumType"
-          :items="spectrumTypeOptions"
-          size="xs"
-          class="w-full"
-          :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }"
-        />
-      </div>
+    <span id="spectrumToolbar" :class="{ 'non-shift': !graphStore.spectrumShiftActive }" :style="toolbarStyle">
+      <div class="spectrum-controls" :style="controlsStyle">
+        <div id="spectrumType" title="Type of Spectrum">
+          <USelect
+            v-model="spectrumType"
+            :items="spectrumTypeOptions"
+            size="xs"
+            class="w-full"
+            :ui="darkControlUi"
+          />
+        </div>
 
-      <div v-show="showOverdrawSelect" id="overdrawSpectrumType" title="Show Filters">
-        <USelect
-          v-model="overdrawType"
-          :items="overdrawOptions"
-          size="xs"
-          class="w-full"
-          :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }"
-        />
-      </div>
+        <div v-show="showOverdrawSelect" id="overdrawSpectrumType" title="Show Filters">
+          <USelect
+            v-model="overdrawType"
+            :items="overdrawOptions"
+            size="xs"
+            class="w-full"
+            :ui="darkControlUi"
+          />
+        </div>
 
-      <div v-show="showComparisonPanel" id="spectrumComparison" class="spectrum-actions">
-        <UDropdownMenu :items="spectrumMenuItems">
-          <UButton size="xs" variant="outline" color="neutral" icon="i-lucide-ellipsis" title="Spectrum actions" :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }" />
-        </UDropdownMenu>
-        <input ref="importInput" type="file" accept=".csv" class="hidden" multiple @change="onImportChange" />
+        <div v-show="showComparisonPanel" id="spectrumComparison">
+          <UDropdownMenu :items="spectrumMenuItems">
+            <UButton size="xs" variant="outline" color="neutral" icon="i-lucide-ellipsis" title="Spectrum actions" :ui="darkControlUi" />
+          </UDropdownMenu>
+          <input ref="importInput" type="file" accept=".csv" class="hidden" multiple @change="onImportChange" />
+        </div>
       </div>
 
       <div id="spectrumButtons" class="spectrum-buttons" :style="buttonsStyle">
@@ -39,7 +41,7 @@
             class="icon-resize-full"
             icon="i-lucide-maximize-2"
             title="Maximize analyser"
-            :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }"
+            :ui="darkControlUi"
           />
           <UButton
             variant="outline"
@@ -48,7 +50,7 @@
             class="icon-resize-small"
             icon="i-lucide-minimize-2"
             title="Minimize analyser"
-            :ui="{ base: 'bg-neutral-800 text-white border-neutral-600' }"
+            :ui="darkControlUi"
           />
         </div>
       </div>
@@ -177,11 +179,28 @@ const showPsdCurve = computed(
   () => spectrumTypeNum.value === SPECTRUM_TYPE.POWER_SPECTRAL_DENSITY,
 );
 
+// Over the plot the controls stay dark: Nuxt UI's own hover colour is near white, under white text
+const darkControlUi = {
+  base: "bg-neutral-800 text-white ring-neutral-600 hover:bg-neutral-700 active:bg-neutral-700",
+};
+
 // --- Computed positioning from analyser layout ---
 const layout = computed(() => graphStore.analyserLayout);
 
+// The whole strip above the plot, so the pointer stays on the analyser on its way to the controls
+const toolbarStyle = computed(() => ({
+  top: `${-layout.value.toolbarHeight}px`,
+  width: `${layout.value.width}px`,
+  height: `${layout.value.toolbarHeight}px`,
+}));
+
 const buttonsStyle = computed(() => ({
   left: `${layout.value.width - 30}px`,
+}));
+
+// Up to the maximise button: the selects shrink only when the analyser is too narrow for them
+const controlsStyle = computed(() => ({
+  width: `${Math.max(layout.value.width - 41, 0)}px`,
 }));
 
 const zoomXStyle = computed(() => ({

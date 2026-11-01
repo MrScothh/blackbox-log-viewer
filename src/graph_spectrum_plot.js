@@ -447,7 +447,7 @@ GraphSpectrumPlot._drawPowerSpectralDensityGraph = function (canvasCtx) {
     "dBm/Hz",
     ticksCount,
   );
-  const offset = 1;
+  const offset = 1 + this._rateWarningRows();
   this._drawInterestFrequency(
     canvasCtx,
     this._fftData.maxNoiseFrequency,
@@ -842,7 +842,7 @@ GraphSpectrumPlot._drawFiltersAndMarkers = function (canvasCtx) {
   const MAXIMAL_PLOTTED_FREQUENCY =
     (0.5 * this._fftData.blackBoxRate) / this._zoomX;
 
-  let offset = 2; // make some space! Includes the space for the mouse frequency. In this way the other elements don't move in the screen when used
+  let offset = 2 + this._rateWarningRows(); // make some space! Includes the space for the mouse frequency. In this way the other elements don't move in the screen when used
 
   // Gyro filters
   if (
@@ -1833,6 +1833,11 @@ GraphSpectrumPlot.setLogRateWarningInfo = function (logRateInfo) {
   this._logRateWarning = logRateInfo;
 };
 
+// The rate warning takes label row 1, under the mouse frequency, so it never lands on a filter label
+GraphSpectrumPlot._rateWarningRows = function () {
+  return this._logRateWarning === undefined ? 0 : 1;
+};
+
 GraphSpectrumPlot._drawRateWarning = function (canvasCtx) {
   if (this._logRateWarning !== undefined) {
     canvasCtx.save();
@@ -1851,7 +1856,7 @@ GraphSpectrumPlot._drawRateWarning = function (canvasCtx) {
       betaflightRate = this._logRateWarning.betaflightRate.toFixed(0);
     const WarningText = `THE ACTUAL AND CONFIG LOG DATA RATE DIFFERENCE: ${actualRate} : ${betaflightRate}`;
     const X = canvasCtx.canvas.width / 2,
-      Y = canvasCtx.canvas.height / 12;
+      Y = 15 * 1 + MARGIN + 1;
     canvasCtx.strokeText(WarningText, X, Y);
     canvasCtx.fillText(WarningText, X, Y);
 
