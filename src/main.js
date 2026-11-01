@@ -18,7 +18,7 @@ import { restorePenDefaults, changePenSmoothing, changePenZoom, changePenExpo } 
 import { createKeydownHandler } from "./keyboard_handler.js";
 import { upgradeWorkspaceFormat, saveWorkspaces, loadWorkspaces } from "./workspace_io.js";
 import { exportCsv, exportGpx, exportSpectrumToCsv } from "./export_utils.js";
-import { syncLogToVideo, setVideoOffset, setVideoTime, setVideoInTime, setVideoOutTime, loadVideo, reportVideoError } from "./video_handler.js";
+import { syncLogToVideo, setVideoOffset, setVideoDrift, setVideoTime, setVideoInTime, setVideoOutTime, loadVideo, reportVideoError, videoSecondsFromLogMicros } from "./video_handler.js";
 import { renderLogFileInfo, renderSelectedLogInfo, setSeekBarMode } from "./log_lifecycle.js";
 import { invalidateGraph, updateCanvasSize, setGraphState, setCurrentBlackboxTime, setPlaybackRate, setGraphZoom, showConfigFile, showValueTable, logJumpBack, logJumpForward, logJumpStart, logJumpEnd, logPlayPause, setMarker, logSyncHere, logSyncBack, logSyncForward, logSmartSync, videoLoaded } from "./playback_controls.js";
 import { PrefStorage } from "./pref_storage.js";
@@ -147,6 +147,7 @@ function BlackboxLogViewer() {
       userSettings,
     );
     graphStore.graph = graph;
+    graphStore.craftKind = graph.getCraftKind();
 
     setVideoInTime(false);
     setVideoOutTime(false);
@@ -264,6 +265,7 @@ function BlackboxLogViewer() {
       renderLogFileInfo(file);
       graphStore.seekBarMode = "avgThrottle";
       playbackStore.currentOffsetCache.log = file.name; // store the name of the loaded log file
+      playbackStore.syncAnchor = null;
       playbackStore.currentOffsetCache.index = null; // and clear the index
 
       logStore.hasLog = true;
@@ -612,11 +614,17 @@ function BlackboxLogViewer() {
         setVideoOffset(offset, true);
       }
     };
+    playbackStore.setVideoDriftValue = (val) => {
+      const drift = Number.parseFloat(val);
+      if (!Number.isNaN(drift)) {
+        setVideoDrift(drift, true);
+      }
+    };
     playbackStore.setGraphTime = (timeStr) => {
       let newTime = stringTimetoMsec(timeStr);
       if (!isNaN(newTime)) {
         if (logStore.hasVideo) {
-          setVideoTime(newTime / 1000000 + playbackStore.videoOffset);
+          setVideoTime(videoSecondsFromLogMicros(newTime));
         } else {
           newTime += logStore.flightLog?.getMinTime() ?? 0;
           setCurrentBlackboxTime(newTime);
@@ -667,6 +675,7 @@ function BlackboxLogViewer() {
     outTime: playbackStore.videoExportOutTime,
     flightVideo: logStore.hasVideo && appStore.viewVideo ? video.cloneNode() : false,
     flightVideoOffset: playbackStore.videoOffset,
+    flightVideoDrift: playbackStore.videoDrift,
     hasCraft: userSettings.drawCraft,
     hasAnalyser: graphStore.hasAnalyser,
     hasSticks: userSettings.drawSticks,
@@ -685,6 +694,14 @@ function BlackboxLogViewer() {
       graph.refreshOptions(userSettings);
       graph.refreshLogo();
       graph.initializeCraftModel();
+      graphStore.craftKind = graph.getCraftKind();
+      updateCanvasSize();
+    }
+  };
+  appStore.previewUserSettings = (newSettings) => {
+    settingsStore.preview(newSettings);
+    if (graph != null) {
+      graph.refreshOptions(userSettings);
       updateCanvasSize();
     }
   };

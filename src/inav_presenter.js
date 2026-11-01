@@ -150,6 +150,10 @@ function decodeInavUnits(flightLog, fieldName, value, settings) {
 
 // Text for an INAV field, or undefined when the shared presenter already shows it correctly
 export function decodeInavField(flightLog, fieldName, value, settings) {
+  // GPS fields have no value before the first G frame
+  if (value == null) {
+    return "";
+  }
   const withUnit = decodeInavUnits(flightLog, fieldName, value, settings);
   if (withUnit !== undefined) {
     return withUnit;
