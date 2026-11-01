@@ -17,7 +17,9 @@ const INAV_DEBUG_FIELDS = {
   RPM_FILTER: {
     label: "RPM filter",
     names: Array.from({ length: 8 }, (_, i) => `Motor ${i + 1} RPM`),
-    decode: (index, value) => `${value} rpm`,
+    // eRPM / 100 as logged, like Betaflight's eRPM[] fields; motor_poles is in the same firmware's header
+    decode: (index, value, sysConfig) =>
+      `${((value * 200) / (sysConfig?.motor_poles || 14)).toFixed(0)} rpm`,
   },
   DYN_IDLE: {
     label: "Dynamic idle",
@@ -172,8 +174,9 @@ function decodeInavUnits(flightLog, fieldName, value, settings) {
     case "escRPM":
       return `${value} rpm`;
     case "debug": {
-      const spec = INAV_DEBUG_FIELDS[DEBUG_MODE[flightLog?.getSysConfig()?.debug_mode]];
-      return spec && axis !== undefined ? spec.decode(Number(axis), value) : `${value}`;
+      const sysConfig = flightLog?.getSysConfig();
+      const spec = INAV_DEBUG_FIELDS[DEBUG_MODE[sysConfig?.debug_mode]];
+      return spec && axis !== undefined ? spec.decode(Number(axis), value, sysConfig) : `${value}`;
     }
     case "rxUpdateRate":
       return `${value} Hz`;
