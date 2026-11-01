@@ -6,10 +6,11 @@ export const mixerList = [
   { name: "Bicopter", model: "custom", image: "bicopter", defaultMotorOrder: [0, 1], defaultYawOffset: 0 },
   { name: "Gimbal", model: "custom", image: "custom", defaultMotorOrder: [0, 1, 2], defaultYawOffset: 0 },
   { name: "Y6", model: "y6", image: "y6", defaultMotorOrder: [4, 1, 3, 5, 2, 0], defaultYawOffset: 0 },
-  { name: "Hex +", model: "hex_plus", image: "hex_p", defaultMotorOrder: [4, 1, 3, 5, 2, 0], defaultYawOffset: 0 },
+  // The two hexa entries had each other's orientation; motor positions checked against INAV's presets
+  { name: "Hex +", model: "hex_plus", image: "hex_p", defaultMotorOrder: [1, 4, 3, 2, 5, 0], defaultYawOffset: Math.PI / 6 },
   { name: "Flying Wing", model: "custom", image: "flying_wing", defaultMotorOrder: [0], defaultYawOffset: 0 },
   { name: "Y4", model: "y4", image: "y4", defaultMotorOrder: [1, 3, 2, 0], defaultYawOffset: Math.PI / 4 },
-  { name: "Hex X", model: "hex_x", image: "hex_x", defaultMotorOrder: [4, 1, 3, 5, 2, 0], defaultYawOffset: Math.PI / 6 },
+  { name: "Hex X", model: "hex_x", image: "hex_x", defaultMotorOrder: [4, 1, 3, 5, 2, 0], defaultYawOffset: 0 },
   { name: "Octo X8", model: "custom", image: "octo_x8", defaultMotorOrder: [5, 1, 4, 0, 7, 3, 6, 2], defaultYawOffset: Math.PI / 8 },
   { name: "Octo Flat +", model: "custom", image: "octo_flat_p", defaultMotorOrder: [5, 1, 4, 0, 7, 3, 6, 2], defaultYawOffset: 0 },
   { name: "Octo Flat X", model: "custom", image: "octo_flat_x", defaultMotorOrder: [5, 1, 4, 0, 7, 3, 6, 2], defaultYawOffset: Math.PI / 8 },
@@ -29,8 +30,8 @@ export const mixerList = [
 
 // Default user settings — used as baseline before user overrides
 export const defaultUserSettings = {
-  mixerConfiguration: 3,
-  customMix: null,
+  // The craft model chosen for each kind of log (craft_kind.js); a kind not listed is left to the log
+  craftModels: {},
   stickMode: 2,
   stickUnits: false,
   stickTrails: false,
@@ -61,7 +62,8 @@ export const defaultUserSettings = {
   overdrawSpectrumType: 0,
   psdHeatmapMin: -40,
   psdHeatmapMax: 10,
-  craft: { left: "15%", top: "48%", size: "40%" },
+  // top is the centre: at 30% the 40% box ends at 50%, clear of the analyser from 60%
+  craft: { left: "15%", top: "30%", size: "40%" },
   sticks: { left: "75%", top: "20%", size: "30%" },
   analyser: { left: "2%", top: "60%", size: "35%" },
   analyser_legend: { left: "88%", top: "7%", width: "10%" },
