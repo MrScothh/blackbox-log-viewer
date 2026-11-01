@@ -9,6 +9,39 @@ import {
   INAV_HW_HEALTH_SENSORS,
   INAV_HW_HEALTH_STATUS,
 } from "./inav_defs.js";
+import { DEBUG_MODE } from "./flightlog_fielddefs.js";
+
+// INAV debug modes whose fields have names and units of their own (docs/Blackbox.md); the others stay "debug[n]
+// (MODE)" with the value as logged, since INAV's modes share Betaflight's names but not their contents
+const INAV_DEBUG_FIELDS = {
+  RPM_FILTER: {
+    label: "RPM filter",
+    names: Array.from({ length: 8 }, (_, i) => `Motor ${i + 1} RPM`),
+    decode: (index, value) => `${value} rpm`,
+  },
+  DYN_IDLE: {
+    label: "Dynamic idle",
+    names: ["Idle P", "Idle I", "Idle D", "Slowest motor"],
+    // P, I and D in 0.0001 of the motor range; the slowest motor in 0.1 Hz
+    decode: (index, value) =>
+      index === 3
+        ? `${(value / 10).toFixed(1)} Hz / ${value * 6} rpm`
+        : `${(value / 100).toFixed(2)} % of range`,
+  },
+};
+
+// The field's name under an INAV debug mode with its own names, or undefined
+export function inavDebugFieldName(fieldName, debugModeName) {
+  const spec = INAV_DEBUG_FIELDS[debugModeName];
+  if (!spec) {
+    return undefined;
+  }
+  if (fieldName === "debug[all]") {
+    return spec.label;
+  }
+  const index = /^debug\[(\d+)\]$/.exec(fieldName)?.[1];
+  return index === undefined ? undefined : spec.names[Number(index)];
+}
 
 // Names of the set bits; offset is the bit number of bit 0 (flightModeFlags2 carries RC modes 32-63)
 function presentBits(value, names, offset = 0) {
@@ -138,9 +171,10 @@ function decodeInavUnits(flightLog, fieldName, value, settings) {
       return value === -1250 ? "" : `${(value / 10).toFixed(1)} °C`;
     case "escRPM":
       return `${value} rpm`;
-    // INAV's debug modes share names with Betaflight's but not their units: as logged
-    case "debug":
-      return `${value}`;
+    case "debug": {
+      const spec = INAV_DEBUG_FIELDS[DEBUG_MODE[flightLog?.getSysConfig()?.debug_mode]];
+      return spec && axis !== undefined ? spec.decode(Number(axis), value) : `${value}`;
+    }
     case "rxUpdateRate":
       return `${value} Hz`;
     default:
