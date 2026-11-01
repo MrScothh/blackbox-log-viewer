@@ -111,15 +111,17 @@ export function FlightLog(logData) {
 
     if (rawStats.field === undefined) {
       rawStats.field = [];
+      // INAV at blackbox_rate_denom 32 and above can log I-frames only
+      const pField = rawStats.frame.P?.field ?? [];
       for (let i = 0; i < rawStats.frame.I.field.length; ++i) {
         rawStats.field[i] = {
           min: Math.min(
             rawStats.frame.I.field[i].min,
-            rawStats.frame.P.field[i].min,
+            pField[i]?.min ?? Infinity,
           ),
           max: Math.max(
             rawStats.frame.I.field[i].max,
-            rawStats.frame.P.field[i].max,
+            pField[i]?.max ?? -Infinity,
           ),
         };
       }
@@ -573,6 +575,9 @@ export function FlightLog(logData) {
         parser.resetDataState();
 
         //Prime the parser with the previous state we get from the flightlog index, so it can base deltas off that data
+        parser.setTimeRolloverAccumulator(
+          iframeDirectory.initialTimeRollover?.[chunkIndex] ?? 0,
+        );
         gpsTransform = null;
         const initialGPSHome = iframeDirectory.initialGPSHome?.[chunkIndex];
         if (initialGPSHome) {
@@ -1482,7 +1487,7 @@ export function FlightLog(logData) {
 
   this.getCurrentLogRowsCount = function () {
     const stats = this.getStats(this.getLogIndex());
-    return stats.frame["I"].validCount + stats.frame["P"].validCount;
+    return stats.frame["I"].validCount + (stats.frame["P"]?.validCount ?? 0);
   };
 }
 
